@@ -1,13 +1,12 @@
 import express from "express";
+import routesPacients from "./routes/pacientRoute.js"
 
 const app = express();
 
+
 app.use(express.json());
 
-app.get("/", (_, res) => {
-    res.json({
-        message: "Servidor funcionando"
-    });
-});
+app.use("/", routesPacients);
+
 
 export default app;

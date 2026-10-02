@@ -3,6 +3,13 @@ import { CreatePacientDTO, UpdatePacientDTO, Pacient } from "../models/pacient.m
 import { pacients } from "../mocks/pacient.mock.js";
 
 
+export const prueba = async (_req: Request, res: Response): Promise<Response> => {
+  return res.status(200)
+};
+
+
+
+
 export const getAllPacients = async (_req: Request, res: Response): Promise<Response> => {
   try {
     if (!pacients || pacients.length === 0) {
