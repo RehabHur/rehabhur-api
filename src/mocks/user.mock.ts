@@ -1,8 +1,5 @@
 import { User } from "../models/user.model.js";
 
-//comentario para poder hacer commit //
-
-
 export const users: User[] = [
     {
         id: 1,
