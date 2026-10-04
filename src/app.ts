@@ -1,14 +1,18 @@
 import express from "express";
-import routesPacients from "./routes/pacientRoute.js"
-import routesTeaching from "./routes/teachingRoute.js"
+import routesPacients from "./routes/patient.routes.js"
+import routesTeaching from "./routes/teacher.routes.js"
 
 const app = express();
 
 
 app.use(express.json());
 
-app.use("/", routesPacients);
-app.use("/", routesTeaching);
+app.get("/", (_req, res) => {
+    res.status(200).json({ message: "Servidor funcionando" });
+});
+
+app.use("/api/v1/patients", routesPacients);
+app.use("/api/v1/teachers", routesTeaching);
 
 
 export default app;
