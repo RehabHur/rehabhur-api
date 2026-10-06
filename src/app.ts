@@ -2,6 +2,8 @@ import express from "express";
 import routesPacients from "./routes/patient.routes.js"
 import routesTeaching from "./routes/teacher.routes.js"
 
+import exerciseRoutes from "./routes/exercises.js";
+
 const app = express();
 
 
