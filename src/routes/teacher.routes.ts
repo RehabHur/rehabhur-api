@@ -1,22 +1,19 @@
 import { Router } from "express";
-import {
-    getAllTeachers,
-    getTeacherById,
-    createTeacher,
-    updateTeacher,
-    deleteTeacherById
-} from "../controllers/teacher.controller.js";
+import { TeacherController } from "../controllers/teacher.controller.js";
 
 const router = Router();
 
-router.get("/teachers", getAllTeachers);
+// Create an instance of the TeacherController
+const teacherController = new TeacherController();
 
-router.get("/teachers/:id", getTeacherById);
+router.get("/", teacherController.getAllTeachers);
 
-router.post("/teachers", createTeacher);
+// router.get("/teachers/:id", getTeacherById);
 
-router.put("/teachers/:id", updateTeacher);
+// router.post("/teachers", createTeacher);
 
-router.delete("/teachers/:id", deleteTeacherById);
+// router.put("/teachers/:id", updateTeacher);
+
+// router.delete("/teachers/:id", deleteTeacherById);
 
 export default router;
