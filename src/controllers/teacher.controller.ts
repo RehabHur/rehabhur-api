@@ -11,36 +11,30 @@ export class TeacherController {
     this.teacherService = new TeacherService();
   }
 
+
+
+  //Todos
   getAllTeachers = async (_req: Request, res: Response): Promise<Response> => {
     const teachers: TeacherResponse[] = this.teacherService.getAllTeachers();
 
-    if (!teachers || teachers.length === 0) {
-      return res.status(404).json({ message: "No se encontró ningún docente" });
-    }
+
 
     return res.status(200).json(teachers);
   };
+
+
+  getTeacherById = async (req: Request, res: Response): Promise<Response> => {
+    const id: number = Number(req.params.id);
+    const teacher: TeacherResponse | undefined = this.teacherService.getTeacherById(id);
+
+    return res.status(200).json(teacher);
+  };
+
+  
 }
 
-// export const getTeacherById = async (req: Request<{ id: number }>, res: Response): Promise<Response> => {
-//   try {
-//     const id = Number(req.params.id);
 
-//     if (isNaN(id)) {
-//       return res.status(400).json({ message: "El id debe ser numérico" });
-//     }
 
-//     const findTeacher = teachers.find((p) => p.id === id);
-
-//     if (!findTeacher) {
-//       return res.status(404).json({ message: `El docente con id ${id} no se encuentra.` });
-//     }
-
-//     return res.status(200).json(findTeacher);
-//   } catch (error) {
-//     return res.status(500).json({ message: "Error en el servidor", error });
-//   }
-// };
 
 // export const createTeacher = async (req: Request<{}, {}, CreateTeacherRequest>, res: Response): Promise<Response> => {
 //   try {

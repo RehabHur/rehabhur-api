@@ -6,4 +6,8 @@ export class TeacherRepository {
     findAll(): Teacher[] {
         return teachers;
     }
+
+    getTeacherById(id: number): Teacher | undefined {
+        return teachers.find(t => t.id === id);
+    }
 }
