@@ -9,6 +9,7 @@ export const createTeacherSchema = z.object({
 });
 
 // Crea un tipo TypeScript a partir del esquema de validación
+
 export type CreateTeacherRequest = z.infer<typeof createTeacherSchema>;
 
 export type UpdateTeacherRequest = z.infer<typeof createTeacherSchema> & { id: string };
