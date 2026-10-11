@@ -1,10 +1,7 @@
 import express from "express";
-import routesPacients from "./routes/patient.routes.js"
-import routesTeaching from "./routes/teacher.routes.js"
-import exerciseRoutes from "./routes/exercises.js";
+import { teacherRoutes, patientRoutes, exercisesRoutes } from "./routes/index.js";
 
 const app = express();
-
 
 app.use(express.json());
 
@@ -12,8 +9,8 @@ app.get("/", (_req, res) => {
     res.status(200).json({ message: "Servidor funcionando" });
 });
 
-app.use("/api/v1/patients", routesPacients);
-app.use("/api/v1/teachers", routesTeaching);
-
+app.use("/api/v1/teachers", teacherRoutes);
+app.use("/api/v1/patients", patientRoutes);
+app.use("/api/v1/exercises", exercisesRoutes);
 
 export default app;

@@ -1,18 +1,18 @@
 import { Request, Response, NextFunction } from "express";
 import { ZodType } from "zod";
 
-type Buscador<T> = (id: number) => T | undefined;
+type Seeker<T> = (id: number) => T | undefined;
 
 //validador generico para todas las entidades buscar si existe ono
-export const validadorExistencia = <T>(
-  buscador: Buscador<T>,
+export const existenceValidator = <T>(
+  seeker: Seeker<T>,
   entidad: string,
 ) => {
   return (req: Request, res: Response, next: NextFunction): Response | void => {
     const id = Number(req.params.id);
-    const instancia = buscador(id);
+    const instance = seeker(id);
 
-    if (!instancia) {
+    if (!instance) {
       return res.status(404).json({
         message: `El id ${id} no existe en ${entidad}`,
       });
@@ -23,7 +23,7 @@ export const validadorExistencia = <T>(
 };
 
 //validar cuando buscamos por id , el id ingresado es numerico
-export const validadorIdNumerico = (
+export const numericIdValidator = (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -40,7 +40,7 @@ export const validadorIdNumerico = (
 };
 
 //validador de schema
-export const validadorSchema = (schema: ZodType) => {
+export const schemaValidator = (schema: ZodType) => {
   return (req: Request, res: Response, next: NextFunction): Response | void => {
     const result = schema.safeParse(req.body);
 

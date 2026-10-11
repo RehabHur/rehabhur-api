@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { TeacherController } from "../controllers/teacher.controller.js";
+import { TeacherController } from "../controllers/index.js";
 import { TeacherRepository } from "../repository/teacher.repository.js";
 import { createTeacherSchema } from "../schemas/teacher.schema.js";
 import {
-  validadorIdNumerico,
-  validadorExistencia,
-  validadorSchema,
+  schemaValidator,
+  existenceValidator,
+  numericIdValidator,
 } from "../middlewares/validadores.js";
 
 const router = Router();
@@ -18,30 +18,30 @@ router.get("/", teacherController.getAllTeachers);
 //el modelo directamente ahora lo simulamos asi
 router.get(
   "/:id",
-  validadorIdNumerico,
-  validadorExistencia((id) => teacherRepository.getTeacherById(id), "docente"),
+  numericIdValidator,
+  existenceValidator((id) => teacherRepository.getTeacherById(id), "docente"),
   teacherController.getTeacherById,
 );
 
 router.post(
   "/",
-  validadorSchema(createTeacherSchema),
+  schemaValidator(createTeacherSchema),
   teacherController.createTeacher,
 );
 
 router.put(
   "/:id",
-  validadorIdNumerico,
-  validadorExistencia((id) => teacherRepository.getTeacherById(id), "docente"),
-  validadorSchema(createTeacherSchema),
+  numericIdValidator,
+  existenceValidator((id) => teacherRepository.getTeacherById(id), "docente"),
+  schemaValidator(createTeacherSchema),
   teacherController.updateTeacher,
 );
 
 
 router.delete(
   "/:id",
-  validadorIdNumerico,
-  validadorExistencia((id) => teacherRepository.getTeacherById(id), "docente"),
+  numericIdValidator,
+  existenceValidator((id) => teacherRepository.getTeacherById(id), "docente"),
   teacherController.deleteTeacherById,
 );
 

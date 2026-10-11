@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { ExerciseController } from "../controllers/ExerciseController.js";
+import { ExerciseController } from "../controllers/exercise.controller.js";
 
 // Define las rutas relacionadas con los ejercicios.
 const router = Router();

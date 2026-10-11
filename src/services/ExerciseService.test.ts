@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { ExerciseService } from "./ExerciseService.js";
+import { ExerciseService } from "./excercise.service.js";
 
 describe("ExerciseService", () => {
     it("debería devolver la lista de ejercicios disponibles", async () => {
