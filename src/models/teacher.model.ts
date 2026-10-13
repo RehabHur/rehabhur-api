@@ -4,5 +4,5 @@ export interface Teacher {
     lastName: string;
     email: string;
     dni: string;
-    comision: number
+    comision: number;
 }
