@@ -1,53 +1,48 @@
 import { Teacher } from "../models/teacher.model.js";
 import { teachers } from "../mocks/techer.mock.js";
-import { CreateTeacher } from "../repository/dto/teacher-create.dto.js";
 import { UpdateTeacher } from "../repository/dto/teacher-update.dto.js";
-import { da } from "zod/locales";
+import { CreateTeacherDto, UpdateTeacherDto } from "../schemas/teacher.schema.js";
 
 export class TeacherRepository {
   findAll(): Teacher[] {
     return teachers;
   }
 
-  getTeacherById(id: number): Teacher | undefined {
+  findById(id: number): Teacher | undefined {
     return teachers.find((t) => t.id === id);
   }
 
-  createTeacher(data: CreateTeacher): Teacher {
-    const newId = teachers.length
+  create(data: CreateTeacherDto): Teacher {
+    const id = teachers.length
       ? Math.max(...teachers.map((t) => t.id)) + 1
       : 1;
-    const newTeacher: Teacher = {
-      id: newId,
-      name: data.name,
-      lastName: data.lastName,
-      email: data.email,
-      dni: data.dni,
-      comision: data.comision,
+
+    const teacher: Teacher = {
+      id,
+      ...data
     };
-    teachers.push(newTeacher);
-    return newTeacher;
+
+    teachers.push(teacher);
+    return teacher;
   }
 
-  updateTeacher(idx: number, data: UpdateTeacher): Teacher {
-    const index = teachers.findIndex((t) => t.id === idx);
+  update(id: number, data: UpdateTeacherDto): Teacher | undefined {
+    const index = teachers.findIndex((teacher) => teacher.id === id);
+    if (index === -1) return undefined;
 
-    const updated: Teacher = {
-      id: idx,
-      name: data.name,
-      lastName: data.lastName,
-      email: data.email,
-      dni: data.dni,
-      comision: data.comision,
-    };
+
+    const updated = { ...teachers[index], ...data };
 
     teachers[index] = updated;
-    return updated;
+
+    return { ...updated };
   }
 
-  deleteTeacherById(id: number): Teacher | undefined {
-  const index = teachers.findIndex((t) => t.id === id);
-  const [eliminado] = teachers.splice(index, 1);
-  return eliminado;
-}
+  delete(id: number): Teacher | undefined {
+    const index = teachers.findIndex((teacher) => teacher.id === id);
+    if (index === -1) return undefined;
+
+    const [deleted] = teachers.splice(index, 1);
+    return deleted ? { ...deleted } : undefined;
+  }
 }
