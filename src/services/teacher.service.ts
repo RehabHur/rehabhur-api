@@ -2,6 +2,8 @@ import { TeacherResponse } from "../repository/dto/teacher-response.dto.js";
 import { TeacherRepository } from "../repository/teacher.repository.js";
 import { CreateTeacher } from "../repository/dto/teacher-create.dto.js";
 import { UpdateTeacher } from "../repository/dto/teacher-update.dto.js";
+import { Teacher } from "../models/teacher.model.js";
+import { CreateTeacherDto, UpdateTeacherDto } from "../schemas/teacher.schema.js";
 
 export class TeacherService {
   private teacherRepository: TeacherRepository;
@@ -10,23 +12,23 @@ export class TeacherService {
     this.teacherRepository = new TeacherRepository();
   }
 
-  getAllTeachers(): TeacherResponse[] {
+  findAll(): Teacher[] {
     return this.teacherRepository.findAll();
   }
 
-  getTeacherById(id: number): { teacher: TeacherResponse | undefined, errorCode: number } {
-    return { teacher: this.teacherRepository.getTeacherById(id), errorCode: 404 };
+  findById(id: number): Teacher | undefined {
+    return this.teacherRepository.findById(id);
   }
 
-  createTeacher(data: CreateTeacher): TeacherResponse {
-    return this.teacherRepository.createTeacher(data);
+  create(data: CreateTeacherDto): Teacher {
+    return this.teacherRepository.create(data);
   }
 
-  updateTeacher(id: number, data: UpdateTeacher): TeacherResponse {
-    return this.teacherRepository.updateTeacher(id, data);
+  update(id: number, data: UpdateTeacherDto): Teacher | undefined {
+    return this.teacherRepository.update(id, data);
   }
 
-  deleteTeacherById(id: number) {
-    return this.teacherRepository.deleteTeacherById(id);
+  delete(id: number) {
+    return this.teacherRepository.delete(id);
   }
 }
