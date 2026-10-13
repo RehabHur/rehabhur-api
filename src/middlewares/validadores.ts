@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { ZodType } from "zod";
 
+//TODO - quitar el validador
+
 type Seeker<T> = (id: number) => T | undefined;
 
 //validador generico para todas las entidades buscar si existe ono
@@ -10,7 +12,7 @@ export const existenceValidator = <T>(
 ) => {
   return (req: Request, res: Response, next: NextFunction): Response | void => {
     const id = Number(req.params.id);
-    const instance = seeker(id);
+    const instance = seeker(id); 
 
     if (!instance) {
       return res.status(404).json({

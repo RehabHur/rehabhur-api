@@ -10,7 +10,7 @@ import {
 
 const router = Router();
 const teacherController = new TeacherController();
-const teacherRepository = new TeacherRepository();
+const teacherRepository = new TeacherRepository(); //TODO - Quitar repositorio 
 
 router.get("/", teacherController.getAllTeachers);
 
@@ -18,8 +18,8 @@ router.get("/", teacherController.getAllTeachers);
 //el modelo directamente ahora lo simulamos asi
 router.get(
   "/:id",
-  numericIdValidator,
-  existenceValidator((id) => teacherRepository.getTeacherById(id), "docente"),
+  //numericIdValidator, //TODO 
+  //existenceValidator((id) => teacherRepository.getTeacherById(id), "docente"),
   teacherController.getTeacherById,
 );
 

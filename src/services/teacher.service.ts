@@ -14,8 +14,8 @@ export class TeacherService {
     return this.teacherRepository.findAll();
   }
 
-  getTeacherById(id: number): TeacherResponse | undefined {
-    return this.teacherRepository.getTeacherById(id);
+  getTeacherById(id: number): { teacher: TeacherResponse | undefined, errorCode: number } {
+    return { teacher: this.teacherRepository.getTeacherById(id), errorCode: 404 };
   }
 
   createTeacher(data: CreateTeacher): TeacherResponse {
