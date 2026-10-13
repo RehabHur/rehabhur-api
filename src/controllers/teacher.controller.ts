@@ -1,57 +1,50 @@
 import { Request, Response } from "express";
 import { TeacherService } from "../services/teacher.service.js";
 import { TeacherResponse } from "../repository/dto/teacher-response.dto.js";
-
-interface TeacherParams {
-  id: string;
-}
+import { TeacherResponseDto, toTeacherResponseDto } from "../dtos/teacher-response.dto.js";
+import { CreateTeacherDto } from "../schemas/teacher.schema.js";
 
 export class TeacherController {
-  private teacherService: TeacherService;
+
+  private readonly service: TeacherService
 
   constructor() {
-    this.teacherService = new TeacherService();
+    this.service = new TeacherService();
   }
 
   //Todos
-  getAllTeachers = async (_req: Request, res: Response): Promise<Response> => {
-    const teachers: TeacherResponse[] = this.teacherService.getAllTeachers();
+  getAll = async (_req: Request, res: Response): Promise<Response<TeacherResponseDto>> => {
+
+    const teachers = this.service.findAll().map((teacher) => toTeacherResponseDto(teacher));
 
     return res.status(200).json(teachers);
   };
 
-  getTeacherById = async (req: Request<TeacherParams>, res: Response): Promise<Response> => {
+  getById = async (req: Request<{ id: string }>, res: Response): Promise<Response> => {
     // TypeScript sabe que 'req.params.id' existe y no te deja pedir 'req.params.algoRaro'
-    const id: number = Number(req.params.id);
+    const teacher = this.service.findById(Number(req.params.id));
 
-    if (isNaN(id)) {
-      return res.status(400).json({ message: "El ID debe ser un número válido" });
-    }
-
-    const { teacher, errorCode } = await this.teacherService.getTeacherById(id);
-
-    return res.status(errorCode || 200).json(teacher);
+    return res.status(200).json(teacher);
   };
 
 
-  createTeacher = async (req: Request, res: Response): Promise<Response> => {
-    const created = this.teacherService.createTeacher(req.body);
+  create = async (req: Request<{}, {}, CreateTeacherDto>, res: Response): Promise<Response> => {
+    const created = this.service.create(req.body);
     return res.status(201).json(created);
   };
 
-  updateTeacher = async (req: Request, res: Response): Promise<Response> => {
+  update = async (req: Request, res: Response): Promise<Response> => {
 
     const id: number = Number(req.params.id);
-    const updated = this.teacherService.updateTeacher(id, req.body);
+
+    const updated = this.service.update(id, req.body);
+
     return res.status(200).json(updated);
   };
 
-  deleteTeacherById = async (
-    req: Request,
-    res: Response,
-  ): Promise<Response> => {
+  deleteById = async (req: Request, res: Response): Promise<Response> => {
     const id: number = Number(req.params.id);
-    const deleted = this.teacherService.deleteTeacherById(id);
+    const deleted = this.service.delete(id);
     return res.status(200).json(deleted);
   };
 }
