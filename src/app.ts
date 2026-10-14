@@ -1,23 +1,22 @@
 import express from "express";
-
-import exerciseRoutes from "./routes/exercises.js";
+import { exercisesRoutes, patientRoutes, teacherRoutes } from "./routes/index.js";
+import { errorHandler, notFoundHandler } from "./middlewares/errorHandler.js";
 
 const app = express();
 
 app.use(express.json());
 
-app.get("/", (_, res) => {
-  res.status(200).json({
-    message: "Servidor funcionando",
-  });
-});
+const healthCheck = (_req: express.Request, res: express.Response): void => {
+    res.status(200).json({ message: "Servidor funcionando" });
+};
 
-app.get("/health", (_, res) => {
-  res.status(200).json({
-    message: "Servidor funcionando",
-  });
-});
+app.get("/", healthCheck);
+app.get("/health", healthCheck);
+app.use("/api/v1/teachers", teacherRoutes);
+app.use("/api/v1/patients", patientRoutes);
+app.use("/api/v1/exercises", exercisesRoutes);
 
-app.use("/api/v1/exercises", exerciseRoutes);
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 export default app;
