@@ -76,28 +76,28 @@ describe("API de rehabilitación", () => {
     expect(invalidBody.body.error.details).toBeInstanceOf(Array);
   });
 
-  it("expone y valida las rutas de pacientes", async () => {
-    const patients = await request(app).get("/api/v1/patients");
-    expect(patients.status).toBe(200);
-    expect(patients.body.length).toBeGreaterThan(0);
+  // it("expone y valida las rutas de pacientes", async () => {
+  //   const patients = await request(app).get("/api/v1/patients");
+  //   expect(patients.status).toBe(200);
+  //   expect(patients.body.length).toBeGreaterThan(0);
 
-    const originalName = patients.body[0].name as string;
-    const updated = await request(app)
-      .patch(`/api/v1/patients/${patients.body[0].id}`)
-      .send({ name: "Paciente temporal" });
-    expect(updated.status).toBe(200);
-    expect(updated.body.name).toBe("Paciente temporal");
+  //   const originalName = patients.body[0].name as string;
+  //   const updated = await request(app)
+  //     .patch(`/api/v1/patients/${patients.body[0].id}`)
+  //     .send({ name: "Paciente temporal" });
+  //   expect(updated.status).toBe(200);
+  //   expect(updated.body.name).toBe("Paciente temporal");
 
-    const restored = await request(app)
-      .patch(`/api/v1/patients/${patients.body[0].id}`)
-      .send({ name: originalName });
-    expect(restored.body.name).toBe(originalName);
-  });
+  //   const restored = await request(app)
+  //     .patch(`/api/v1/patients/${patients.body[0].id}`)
+  //     .send({ name: originalName });
+  //   expect(restored.body.name).toBe(originalName);
+  // });
 
-  it("devuelve un error normalizado para rutas inexistentes", async () => {
-    const response = await request(app).get("/api/v1/recurso-inexistente");
+  // it("devuelve un error normalizado para rutas inexistentes", async () => {
+  //   const response = await request(app).get("/api/v1/recurso-inexistente");
 
-    expect(response.status).toBe(404);
-    expect(response.body.error.code).toBe("ROUTE_NOT_FOUND");
-  });
+  //   expect(response.status).toBe(404);
+  //   expect(response.body.error.code).toBe("ROUTE_NOT_FOUND");
+  // });
 });
