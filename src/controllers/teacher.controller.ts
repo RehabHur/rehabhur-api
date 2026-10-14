@@ -1,50 +1,33 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { TeacherService } from "../services/teacher.service.js";
-import { TeacherResponse } from "../repository/dto/teacher-response.dto.js";
 import { TeacherResponseDto, toTeacherResponseDto } from "../dtos/teacher-response.dto.js";
-import { CreateTeacherDto } from "../schemas/teacher.schema.js";
+import type { CreateTeacherDto, UpdateTeacherDto } from "../schemas/teacher.schema.js";
 
 export class TeacherController {
+  constructor(private readonly service: TeacherService) {}
 
-  private readonly service: TeacherService
-
-  constructor() {
-    this.service = new TeacherService();
-  }
-
-  //Todos
-  getAll = async (_req: Request, res: Response): Promise<Response<TeacherResponseDto>> => {
-
-    const teachers = this.service.findAll().map((teacher) => toTeacherResponseDto(teacher));
-
-    return res.status(200).json(teachers);
+  findAll = (_req: Request, res: Response<TeacherResponseDto[]>): void => {
+    const teachers = this.service.findAll().map(toTeacherResponseDto);
+    res.status(200).json(teachers);
   };
 
-  getById = async (req: Request<{ id: string }>, res: Response): Promise<Response> => {
-    // TypeScript sabe que 'req.params.id' existe y no te deja pedir 'req.params.algoRaro'
+  findById = (req: Request<{ id: string }>, res: Response<TeacherResponseDto>): void => {
     const teacher = this.service.findById(Number(req.params.id));
-
-    return res.status(200).json(teacher);
+    res.status(200).json(toTeacherResponseDto(teacher));
   };
 
-
-  create = async (req: Request<{}, {}, CreateTeacherDto>, res: Response): Promise<Response> => {
+  create = (req: Request<{}, TeacherResponseDto, CreateTeacherDto>, res: Response<TeacherResponseDto>): void => {
     const created = this.service.create(req.body);
-    return res.status(201).json(created);
+    res.status(201).json(toTeacherResponseDto(created));
   };
 
-  update = async (req: Request, res: Response): Promise<Response> => {
-
-    const id: number = Number(req.params.id);
-
-    const updated = this.service.update(id, req.body);
-
-    return res.status(200).json(updated);
+  update = (req: Request<{ id: string }, TeacherResponseDto, UpdateTeacherDto>, res: Response<TeacherResponseDto>): void => {
+    const updated = this.service.update(Number(req.params.id), req.body);
+    res.status(200).json(toTeacherResponseDto(updated));
   };
 
-  deleteById = async (req: Request, res: Response): Promise<Response> => {
-    const id: number = Number(req.params.id);
-    const deleted = this.service.delete(id);
-    return res.status(200).json(deleted);
+  delete = (req: Request<{ id: string }>, res: Response): void => {
+    this.service.delete(Number(req.params.id));
+    res.status(204).end();
   };
 }

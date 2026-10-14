@@ -1,34 +1,43 @@
-import { TeacherResponse } from "../repository/dto/teacher-response.dto.js";
 import { TeacherRepository } from "../repository/teacher.repository.js";
-import { CreateTeacher } from "../repository/dto/teacher-create.dto.js";
-import { UpdateTeacher } from "../repository/dto/teacher-update.dto.js";
 import { Teacher } from "../models/teacher.model.js";
 import { CreateTeacherDto, UpdateTeacherDto } from "../schemas/teacher.schema.js";
+import { AppError } from "../utils/AppError.js";
 
 export class TeacherService {
-  private teacherRepository: TeacherRepository;
-
-  constructor() {
-    this.teacherRepository = new TeacherRepository();
-  }
+  constructor(private readonly repository: TeacherRepository) { }
 
   findAll(): Teacher[] {
-    return this.teacherRepository.findAll();
+    return this.repository.findAll();
   }
 
-  findById(id: number): Teacher | undefined {
-    return this.teacherRepository.findById(id);
+  findById(id: number): Teacher {
+    return this.findOrThrow(id);
   }
 
   create(data: CreateTeacherDto): Teacher {
-    return this.teacherRepository.create(data);
+    return this.repository.create(data);
   }
 
-  update(id: number, data: UpdateTeacherDto): Teacher | undefined {
-    return this.teacherRepository.update(id, data);
+  update(id: number, data: UpdateTeacherDto): Teacher {
+    const teacher = this.repository.update(id, data);
+    if (!teacher) {
+      throw new AppError(404, "TEACHER_NOT_FOUND", "No se encontró el docente");
+    }
+    return teacher;
   }
 
-  delete(id: number) {
-    return this.teacherRepository.delete(id);
+  delete(id: number): void {
+    const deleted = this.repository.delete(id);
+    if (!deleted) {
+      throw new AppError(404, "TEACHER_NOT_FOUND", "No se encontró el docente");
+    }
+  }
+
+  private findOrThrow(id: number): Teacher {
+    const teacher = this.repository.findById(id);
+    if (!teacher) {
+      throw new AppError(404, "TEACHER_NOT_FOUND", "No se encontró el docente");
+    }
+    return teacher;
   }
 }

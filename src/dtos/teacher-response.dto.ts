@@ -3,19 +3,19 @@ import type { Teacher } from "../models/teacher.model.js";
 export interface TeacherResponseDto {
     id: number;
     name: string;
-    lastName: string;
+    last_name: string;
     email: string;
     dni: string;
-    comision: number;
+    commission: number;
 }
 
 export function toTeacherResponseDto(teacher: Teacher): TeacherResponseDto {
     return {
         id: teacher.id,
         name: teacher.name,
-        lastName: teacher.lastName,
+        last_name: teacher.last_name,
         email: teacher.email,
         dni: teacher.dni,
-        comision: teacher.comision,
+        commission: teacher.commission,
     };
 }

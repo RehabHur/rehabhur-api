@@ -2,10 +2,10 @@ import { z } from "zod";
 
 export const createTeacherSchema = z.object({
     name: z.string().trim().min(1, "El nombre es obligatorio"),
-    lastName: z.string().trim().min(1, "El apellido es obligatorio"),
+    last_name: z.string().trim().min(1, "El apellido es obligatorio"),
     email: z.string().trim().email("El correo electrónico no es válido"),
     dni: z.string().trim().min(1, "El DNI es obligatorio"),
-    comision: z.number().int().nonnegative(),
+    commission: z.number().int().nonnegative(),
 });
 
 export const updateTeacherSchema = createTeacherSchema
