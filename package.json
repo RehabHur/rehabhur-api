@@ -1,20 +1,23 @@
 {
   "name": "rehabhur",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "API para la gestión de recursos de rehabilitación",
+  "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsc",
+    "build": "tsc -p tsconfig.build.json",
     "start": "node dist/server.js",
-    "test": "vitest"
+    "test": "vitest run src",
+    "test:watch": "vitest src",
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "dependencies": {
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",

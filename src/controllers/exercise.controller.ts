@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 
-import { ExerciseService } from "../services/ExerciseService.js";
+import { ExerciseService } from "../services/excercise.service.js";
 
 // Inyección de dependencias.
 const exerciseService = new ExerciseService();
