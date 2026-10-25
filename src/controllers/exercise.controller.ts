@@ -4,7 +4,7 @@ import { ExerciseResponseDto, toExerciseResponseDto } from "../dtos/exercise-res
 import type { CreateExerciseDto, UpdateExerciseDto } from "../schemas/exercise.schema.js";
 
 export class ExerciseController {
-  constructor(private readonly service: ExerciseService) {}
+  constructor(private readonly service: ExerciseService) { }
 
   findAll = (_req: Request, res: Response<ExerciseResponseDto[]>): void => {
     const exercises = this.service.findAll().map(toExerciseResponseDto);
