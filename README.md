@@ -40,3 +40,17 @@ La creación y actualización de docentes aceptan `name`, `last_name`, `email`,
 La actualización de pacientes también es parcial. Los datos de docentes,
 pacientes y ejercicios continúan almacenándose en memoria; se reinician con el
 proceso y no constituyen persistencia de producción.
+
+## Imagen de prueba
+
+Al integrar cambios en `develop`, el workflow ejecuta build y tests y, si ambos
+finalizan correctamente, publica la imagen en GitHub Container Registry:
+
+```sh
+docker pull ghcr.io/rehabhur/rehabhur-api:develop
+docker run --rm -p 3000:3000 ghcr.io/rehabhur/rehabhur-api:develop
+```
+
+También se publica una etiqueta con el SHA corto del commit para identificar
+una versión concreta. El paquete debe tener habilitada la lectura para quienes
+vayan a descargar la imagen.
