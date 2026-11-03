@@ -45,6 +45,7 @@ describe("ExerciseService", () => {
         const service = new ExerciseService(new ExerciseRepository());
         const exercises = service.findAll();
 
+        expect(Array.isArray(exercises)).toBe(true);
         expect(exercises.length).toBeGreaterThan(0);
         expect(exercises[0]).toMatchObject({
             id: expect.any(Number),
