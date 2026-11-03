@@ -33,13 +33,23 @@ npm start
 - `POST /api/v1/teachers`, `PATCH /api/v1/teachers/:id`, `DELETE /api/v1/teachers/:id`
 - `GET /api/v1/patients`, `GET /api/v1/patients/:id`
 - `PATCH /api/v1/patients/:id`, `DELETE /api/v1/patients/:id`
-- `GET /api/v1/exercises`
+- `GET /api/v1/persons`, `GET /api/v1/persons/:id`
+- `POST /api/v1/persons`, `PATCH /api/v1/persons/:id`, `DELETE /api/v1/persons/:id`
+- `GET /api/v1/exercises`, `GET /api/v1/exercises/:id`
+- `POST /api/v1/exercises`, `PATCH /api/v1/exercises/:id`, `DELETE /api/v1/exercises/:id`
+- `GET /api/v1/options/body-regions` (también `motion-types` y `materials`)
+
+Las personas aceptan `firstName`, `lastName`, `dni`, `email`, `nationality` y
+`role` (`admin`, `docente`, `estudiante` o `paciente`). La actualización es
+parcial y requiere al menos un campo. Los ejercicios aceptan `name`,
+`bodyRegion`, `motionType`, `material`, `linkVideo` e `instructions`; las
+regiones, tipos de movimiento y materiales se consultan en `/options`.
 
 La creación y actualización de docentes aceptan `name`, `last_name`, `email`,
 `dni` y `commission`. La actualización es parcial y requiere al menos un campo.
 La actualización de pacientes también es parcial. Los datos de docentes,
-pacientes y ejercicios continúan almacenándose en memoria; se reinician con el
-proceso y no constituyen persistencia de producción.
+pacientes, personas y ejercicios continúan almacenándose en memoria; se
+reinician con el proceso y no constituyen persistencia de producción.
 
 ## Imagen de prueba
 

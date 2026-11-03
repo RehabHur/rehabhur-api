@@ -76,28 +76,79 @@ describe("API de rehabilitación", () => {
     expect(invalidBody.body.error.details).toBeInstanceOf(Array);
   });
 
-  // it("expone y valida las rutas de pacientes", async () => {
-  //   const patients = await request(app).get("/api/v1/patients");
-  //   expect(patients.status).toBe(200);
-  //   expect(patients.body.length).toBeGreaterThan(0);
+  it("expone y valida las rutas de pacientes", async () => {
+    const patients = await request(app).get("/api/v1/patients");
+    expect(patients.status).toBe(200);
+    expect(patients.body.length).toBeGreaterThan(0);
 
-  //   const originalName = patients.body[0].name as string;
-  //   const updated = await request(app)
-  //     .patch(`/api/v1/patients/${patients.body[0].id}`)
-  //     .send({ name: "Paciente temporal" });
-  //   expect(updated.status).toBe(200);
-  //   expect(updated.body.name).toBe("Paciente temporal");
+    const originalName = patients.body[0].name as string;
+    const updated = await request(app)
+      .patch(`/api/v1/patients/${patients.body[0].id}`)
+      .send({ name: "Paciente temporal" });
+    expect(updated.status).toBe(200);
+    expect(updated.body.name).toBe("Paciente temporal");
 
-  //   const restored = await request(app)
-  //     .patch(`/api/v1/patients/${patients.body[0].id}`)
-  //     .send({ name: originalName });
-  //   expect(restored.body.name).toBe(originalName);
-  // });
+    const restored = await request(app)
+      .patch(`/api/v1/patients/${patients.body[0].id}`)
+      .send({ name: originalName });
+    expect(restored.body.name).toBe(originalName);
+  });
 
-  // it("devuelve un error normalizado para rutas inexistentes", async () => {
-  //   const response = await request(app).get("/api/v1/recurso-inexistente");
+  it("permite crear, consultar, actualizar y eliminar personas", async () => {
+    const created = await request(app)
+      .post("/api/v1/persons")
+      .send({
+        firstName: "Persona",
+        lastName: "De Prueba",
+        dni: "99999998",
+        email: "persona.prueba@example.com",
+        nationality: "Argentina",
+        role: "estudiante",
+      });
 
-  //   expect(response.status).toBe(404);
-  //   expect(response.body.error.code).toBe("ROUTE_NOT_FOUND");
-  // });
+    expect(created.status).toBe(201);
+    expect(created.body).toMatchObject({
+      firstName: "Persona",
+      lastName: "De Prueba",
+      role: "estudiante",
+    });
+
+    const id = created.body.id as number;
+    const listed = await request(app).get("/api/v1/persons");
+    expect(listed.status).toBe(200);
+    expect(listed.body.some((person: { id: number }) => person.id === id)).toBe(true);
+
+    const updated = await request(app)
+      .patch(`/api/v1/persons/${id}`)
+      .send({ lastName: "Actualizada" });
+    expect(updated.status).toBe(200);
+    expect(updated.body.lastName).toBe("Actualizada");
+    expect(updated.body.nationality).toBe("Argentina");
+
+    const deleted = await request(app).delete(`/api/v1/persons/${id}`);
+    expect(deleted.status).toBe(204);
+    expect((await request(app).get(`/api/v1/persons/${id}`)).status).toBe(404);
+  });
+
+  it("devuelve las opciones para el formulario de ejercicios", async () => {
+    const [regions, motionTypes, materials] = await Promise.all([
+      request(app).get("/api/v1/options/body-regions"),
+      request(app).get("/api/v1/options/motion-types"),
+      request(app).get("/api/v1/options/materials"),
+    ]);
+
+    for (const response of [regions, motionTypes, materials]) {
+      expect(response.status).toBe(200);
+      expect(response.body.length).toBeGreaterThan(0);
+      expect(response.body[0]).toHaveProperty("id");
+      expect(response.body[0]).toHaveProperty("label");
+    }
+  });
+
+  it("devuelve un error normalizado para rutas inexistentes", async () => {
+    const response = await request(app).get("/api/v1/recurso-inexistente");
+
+    expect(response.status).toBe(404);
+    expect(response.body.error.code).toBe("ROUTE_NOT_FOUND");
+  });
 });
