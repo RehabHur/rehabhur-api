@@ -15,8 +15,8 @@ if (decodedSecret.length !== 32 || decodedSecret.toString("base64") !== jwtSecre
 
 export const JWT_SECRET = jwtSecret;
 
-export const ACCESS_TOKEN_TTL = (process.env.JWT_ACCESS_TTL ?? "15m") as SignOptions["expiresIn"];
-export const REFRESH_TOKEN_TTL = (process.env.JWT_REFRESH_TTL ?? "7d") as SignOptions["expiresIn"];
+export const ACCESS_TOKEN_TTL = (process.env.JWT_ACCESS_TTL?.trim() || "15m") as SignOptions["expiresIn"];
+export const REFRESH_TOKEN_TTL = (process.env.JWT_REFRESH_TTL?.trim() || "7d") as SignOptions["expiresIn"];
 
 const parseDurationMs = (value: string): number => {
     const match = /^(\d+)([smhd])$/.exec(value.trim());

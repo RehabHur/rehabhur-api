@@ -1,58 +1,94 @@
 import { Teacher } from "../models/teacher.model.js";
 import { teachers } from "../mocks/teacher.mock.js";
-import { CreateTeacherDto, UpdateTeacherDto } from "../schemas/teacher.schema.js";
+import { getPrismaClient } from "../lib/prisma.js";
+import {
+  CreateTeacherDto,
+  UpdateTeacherDto,
+  ListTeachersQuery,
+} from "../schemas/teacher.schema.js";
 
 export class TeacherRepository {
-  findAll(): Teacher[] {
-    return teachers.map((teacher) => ({ ...teacher }));
+  async findAll(): Promise<Teacher[]> {
+    if (process.env.NODE_ENV === "test") {
+      return teachers.map((teacher) => ({ ...teacher }));
+    }
+
+    return getPrismaClient().teacher.findMany();
   }
 
-  findById(id: number): Teacher | undefined {
-    const teacher = teachers.find((item) => item.id === id);
-    return teacher ? { ...teacher } : undefined;
+
+
+  async findByEmail(email: string): Promise<Teacher | null> {
+    if (process.env.NODE_ENV === "test") {
+      const teacher = teachers.find((item) => item.email === email);
+      return teacher ? { ...teacher } : null;
+    }
+
+    return getPrismaClient().teacher.findUnique({
+      where: { email },
+    });
   }
 
-  create(data: CreateTeacherDto): Teacher {
-    const id = teachers.length
-      ? Math.max(...teachers.map((teacher) => teacher.id)) + 1
-      : 1;
+  async findByDni(dni: string): Promise<Teacher | null> {
+    if (process.env.NODE_ENV === "test") {
+      const teacher = teachers.find((item) => item.dni === dni);
+      return teacher ? { ...teacher } : null;
+    }
 
-    const teacher: Teacher = {
-      id,
-      name: data.name,
-      last_name: data.last_name,
-      email: data.email,
-      dni: data.dni,
-      commission: data.commission,
-    };
-
-    teachers.push(teacher);
-    return { ...teacher };
+    return getPrismaClient().teacher.findUnique({
+      where: { dni },
+    });
   }
 
-  update(id: number, data: UpdateTeacherDto): Teacher | undefined {
-    const index = teachers.findIndex((teacher) => teacher.id === id);
-    if (index === -1) return undefined;
 
-    const updated: Teacher = {
-      ...teachers[index],
-      ...(data.name !== undefined && { name: data.name }),
-      ...(data.last_name !== undefined && { last_name: data.last_name }),
-      ...(data.email !== undefined && { email: data.email }),
-      ...(data.dni !== undefined && { dni: data.dni }),
-      ...(data.commission !== undefined && { commission: data.commission }),
-    };
+  async findById(id: number): Promise<Teacher | null> {
+    if (process.env.NODE_ENV === "test") {
+      const teacher = teachers.find((item) => item.id === id);
+      return teacher ? { ...teacher } : null;
+    }
 
-    teachers[index] = updated;
-
-    return { ...updated };
+    return getPrismaClient().teacher.findUnique({ where: { id } });
   }
 
-  delete(id: number): Teacher | undefined {
-    const index = teachers.findIndex((teacher) => teacher.id === id);
-    if (index === -1) return undefined;
+  async create(data: CreateTeacherDto): Promise<Teacher> {
+    if (process.env.NODE_ENV === "test") {
+      const id = teachers.length ? Math.max(...teachers.map((teacher) => teacher.id)) + 1 : 1;
+      const teacher = { id, ...data };
+      teachers.push(teacher);
+      return { ...teacher };
+    }
 
-    const [deleted] = teachers.splice(index, 1);
-    return deleted ? { ...deleted } : undefined;
+    return getPrismaClient().teacher.create({ data });
+  }
+
+  async update(id: number, data: UpdateTeacherDto): Promise<Teacher> {
+    if (process.env.NODE_ENV === "test") {
+      const index = teachers.findIndex((teacher) => teacher.id === id);
+      if (index === -1) {
+        throw new Error("No se encontró el docente de prueba");
+      }
+
+      teachers[index] = { ...teachers[index]!, ...data };
+      return { ...teachers[index]! };
+    }
+
+    return getPrismaClient().teacher.update({
+      where: { id },
+      data,
+    });
+  }
+
+  async delete(id: number): Promise<Teacher> {
+    if (process.env.NODE_ENV === "test") {
+      const index = teachers.findIndex((teacher) => teacher.id === id);
+      if (index === -1) {
+        throw new Error("No se encontró el docente de prueba");
+      }
+
+      const [deleted] = teachers.splice(index, 1);
+      return { ...deleted! };
+    }
+
+    return getPrismaClient().teacher.delete({ where: { id } });
   }
 }

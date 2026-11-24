@@ -1,417 +1,417 @@
 import { Patient } from "../models/patient.model.js";
 
 
-export const patiens: Patient[] = [
+export const patients: Patient[] = [
   {
     id: 1,
     name: "Juan",
-    lastName: "Pérez",
+    last_name: "Pérez",
     email: "juan.perez@email.com",
     dni: "38123456",
-    comision: 2026
+    commission: 2026
   },
   {
     id: 2,
     name: "María",
-    lastName: "Gómez",
+    last_name: "Gómez",
     email: "maria.gomez@email.com",
     dni: "40234567",
-    comision: 2026
+    commission: 2026
   },
   {
     id: 3,
     name: "Carlos",
-    lastName: "Rodríguez",
+    last_name: "Rodríguez",
     email: "carlos.rodriguez@email.com",
     dni: "37345678",
-    comision: 2025
+    commission: 2025
   },
   {
     id: 4,
     name: "Ana",
-    lastName: "Fernández",
+    last_name: "Fernández",
     email: "ana.fernandez@email.com",
     dni: "41456789",
-    comision: 2026
+    commission: 2026
   },
   {
     id: 5,
     name: "Lucas",
-    lastName: "López",
+    last_name: "López",
     email: "lucas.lopez@email.com",
     dni: "39567890",
-    comision: 2025
+    commission: 2025
   },
   {
     id: 6,
     name: "Lucía",
-    lastName: "Martínez",
+    last_name: "Martínez",
     email: "lucia.martinez@email.com",
     dni: "42678901",
-    comision: 2026
+    commission: 2026
   },
   {
     id: 7,
     name: "Santiago",
-    lastName: "Díaz",
+    last_name: "Díaz",
     email: "santiago.diaz@email.com",
     dni: "36789012",
-    comision: 2025
+    commission: 2025
   },
   {
     id: 8,
     name: "Sofia",
-    lastName: "Sánchez",
+    last_name: "Sánchez",
     email: "sofia.sanchez@email.com",
     dni: "43890123",
-    comision: 2026
+    commission: 2026
   },
   {
     id: 9,
     name: "Mateo",
-    lastName: "Romero",
+    last_name: "Romero",
     email: "mateo.romero@email.com",
     dni: "38901234",
-    comision: 2026
+    commission: 2026
   },
   {
     id: 10,
     name: "Valentina",
-    lastName: "Sosa",
+    last_name: "Sosa",
     email: "valentina.sosa@email.com",
     dni: "40012345",
-    comision: 2025
+    commission: 2025
   },
   {
     id: 11,
     name: "Joaquín",
-    lastName: "Torres",
+    last_name: "Torres",
     email: "joaquin.torres@email.com",
     dni: "41123456",
-    comision: 2026
+    commission: 2026
   },
   {
     id: 12,
     name: "Camila",
-    lastName: "Álvarez",
+    last_name: "Álvarez",
     email: "camila.alvarez@email.com",
     dni: "39234567",
-    comision: 2025
+    commission: 2025
   },
   {
     id: 13,
     name: "Benjamín",
-    lastName: "Ruiz",
+    last_name: "Ruiz",
     email: "benjamin.ruiz@email.com",
     dni: "42345678",
-    comision: 2026
+    commission: 2026
   },
   {
     id: 14,
     name: "Martina",
-    lastName: "Ramírez",
+    last_name: "Ramírez",
     email: "martina.ramirez@email.com",
     dni: "37456789",
-    comision: 2026
+    commission: 2026
   },
   {
     id: 15,
     name: "Felipe",
-    lastName: "Flores",
+    last_name: "Flores",
     email: "felipe.flores@email.com",
     dni: "43567890",
-    comision: 2025
+    commission: 2025
   },
   {
     id: 16,
     name: "Emma",
-    lastName: "Acosta",
+    last_name: "Acosta",
     email: "emma.acosta@email.com",
     dni: "40678901",
-    comision: 2026
+    commission: 2026
   },
   {
     id: 17,
     name: "Gabriel",
-    lastName: "Benítez",
+    last_name: "Benítez",
     email: "gabriel.benitez@email.com",
     dni: "38789012",
-    comision: 2025
+    commission: 2025
   },
   {
     id: 18,
     name: "Victoria",
-    lastName: "Medina",
+    last_name: "Medina",
     email: "victoria.medina@email.com",
     dni: "41890123",
-    comision: 2026
+    commission: 2026
   },
   {
     id: 19,
     name: "Thiago",
-    lastName: "Herrera",
+    last_name: "Herrera",
     email: "thiago.herrera@email.com",
     dni: "39901234",
-    comision: 2026
+    commission: 2026
   },
   {
     id: 20,
     name: "Delfina",
-    lastName: "Aguirre",
+    last_name: "Aguirre",
     email: "delfina.aguirre@email.com",
     dni: "42012345",
-    comision: 2025
+    commission: 2025
   },
   {
     id: 21,
     name: "Bautista",
-    lastName: "Castro",
+    last_name: "Castro",
     email: "bautista.castro@email.com",
     dni: "37123456",
-    comision: 2026
+    commission: 2026
   },
   {
     id: 22,
     name: "Catalina",
-    lastName: "Giménez",
+    last_name: "Giménez",
     email: "catalina.gimenez@email.com",
     dni: "43234567",
-    comision: 2025
+    commission: 2025
   },
   {
     id: 23,
     name: "Lautaro",
-    lastName: "Gutiérrez",
+    last_name: "Gutiérrez",
     email: "lautaro.gutierrez@email.com",
     dni: "40345678",
-    comision: 2026
+    commission: 2026
   },
   {
     id: 24,
     name: "Julieta",
-    lastName: "Molina",
+    last_name: "Molina",
     email: "julieta.molina@email.com",
     dni: "38456789",
-    comision: 2026
+    commission: 2026
   },
   {
     id: 25,
     name: "Tomas",
-    lastName: "Silva",
+    last_name: "Silva",
     email: "tomas.silva@email.com",
     dni: "41567890",
-    comision: 2025
+    commission: 2025
   },
   {
     id: 26,
     name: "Mia",
-    lastName: "Rojas",
+    last_name: "Rojas",
     email: "mia.rojas@email.com",
     dni: "39678901",
-    comision: 2026
+    commission: 2026
   },
   {
     id: 27,
     name: "Agustín",
-    lastName: "Ortiz",
+    last_name: "Ortiz",
     email: "agustin.ortiz@email.com",
     dni: "42789012",
-    comision: 2025
+    commission: 2025
   },
   {
     id: 28,
     name: "Zoe",
-    lastName: "Nuñez",
+    last_name: "Nuñez",
     email: "zoe.nunez@email.com",
     dni: "37890123",
-    comision: 2026
+    commission: 2026
   },
   {
     id: 29,
     name: "Nicolas",
-    lastName: "Luna",
+    last_name: "Luna",
     email: "nicolas.luna@email.com",
     dni: "43901234",
-    comision: 2026
+    commission: 2026
   },
   {
     id: 30,
     name: "Olivia",
-    lastName: "Juárez",
+    last_name: "Juárez",
     email: "olivia.juarez@email.com",
     dni: "40098765",
-    comision: 2025
+    commission: 2025
   },
   {
     id: 31,
     name: "Gael",
-    lastName: "Cabrera",
+    last_name: "Cabrera",
     email: "gael.cabrera@email.com",
     dni: "38198765",
-    comision: 2026
+    commission: 2026
   },
   {
     id: 32,
     name: "Paula",
-    lastName: "Ríos",
+    last_name: "Ríos",
     email: "paula.rios@email.com",
     dni: "41298765",
-    comision: 2025
+    commission: 2025
   },
   {
     id: 33,
     name: "Maximiliano",
-    lastName: "Morales",
+    last_name: "Morales",
     email: "maximiliano.morales@email.com",
     dni: "39398765",
-    comision: 2026
+    commission: 2026
   },
   {
     id: 34,
     name: "Renata",
-    lastName: "Godoy",
+    last_name: "Godoy",
     email: "renata.godoy@email.com",
     dni: "42498765",
-    comision: 2026
+    commission: 2026
   },
   {
     id: 35,
     name: "Ian",
-    lastName: "Moreno",
+    last_name: "Moreno",
     email: "ian.moreno@email.com",
     dni: "37598765",
-    comision: 2025
+    commission: 2025
   },
   {
     id: 36,
     name: "Abigail",
-    lastName: "Peralta",
+    last_name: "Peralta",
     email: "abigail.peralta@email.com",
     dni: "43698765",
-    comision: 2026
+    commission: 2026
   },
   {
     id: 37,
     name: "Emiliano",
-    lastName: "Vega",
+    last_name: "Vega",
     email: "emiliano.vega@email.com",
     dni: "40798765",
-    comision: 2025
+    commission: 2025
   },
   {
     id: 38,
     name: "Aitana",
-    lastName: "Carrizo",
+    last_name: "Carrizo",
     email: "aitana.carrizo@email.com",
     dni: "38898765",
-    comision: 2026
+    commission: 2026
   },
   {
     id: 39,
     name: "Lisandro",
-    lastName: "Quiroga",
+    last_name: "Quiroga",
     email: "lisandro.quiroga@email.com",
     dni: "41998765",
-    comision: 2026
+    commission: 2026
   },
   {
     id: 40,
     name: "Isabella",
-    lastName: "Ojeda",
+    last_name: "Ojeda",
     email: "isabella.ojeda@email.com",
     dni: "39087654",
-    comision: 2025
+    commission: 2025
   },
   {
     id: 41,
     name: "Axel",
-    lastName: "Mendoza",
+    last_name: "Mendoza",
     email: "axel.mendoza@email.com",
     dni: "42187654",
-    comision: 2026
+    commission: 2026
   },
   {
     id: 42,
     name: "Florencia",
-    lastName: "Nieto",
+    last_name: "Nieto",
     email: "florencia.nieto@email.com",
     dni: "37287654",
-    comision: 2025
+    commission: 2025
   },
   {
     id: 43,
     name: "Dante",
-    lastName: "Soria",
+    last_name: "Soria",
     email: "dante.soria@email.com",
     dni: "43387654",
-    comision: 2026
+    commission: 2026
   },
   {
     id: 44,
     name: "Josefina",
-    lastName: "Villalba",
+    last_name: "Villalba",
     email: "josefina.villalba@email.com",
     dni: "40487654",
-    comision: 2026
+    commission: 2026
   },
   {
     id: 45,
     name: "Ezequiel",
-    lastName: "Franco",
+    last_name: "Franco",
     email: "ezequiel.franco@email.com",
     dni: "38587654",
-    comision: 2025
+    commission: 2025
   },
   {
     id: 46,
     name: "Guadalupe",
-    lastName: "Ibarra",
+    last_name: "Ibarra",
     email: "guadalupe.ibarra@email.com",
     dni: "41687654",
-    comision: 2026
+    commission: 2026
   },
   {
     id: 47,
     name: "Marcos",
-    lastName: "Ledesma",
+    last_name: "Ledesma",
     email: "marcos.ledesma@email.com",
     dni: "39787654",
-    comision: 2025
+    commission: 2025
   },
   {
     id: 48,
     name: "Lola",
-    lastName: "Vera",
+    last_name: "Vera",
     email: "lola.vera@email.com",
     dni: "42887654",
-    comision: 2026
+    commission: 2026
   },
   {
     id: 49,
     name: "Facundo",
-    lastName: "Maldonado",
+    last_name: "Maldonado",
     email: "facundo.maldonado@email.com",
     dni: "37987654",
-    comision: 2026
+    commission: 2026
   },
   {
     id: 50,
     name: "Clara",
-    lastName: "Arias",
+    last_name: "Arias",
     email: "clara.arias@email.com",
     dni: "43087654",
-    comision: 2025
+    commission: 2025
   }
 ];
 
 // Pacientes adicionales para probar listados y paginación.
 for (let index = 1; index <= 50; index += 1) {
-  patiens.push({
-    id: patiens.length + 1,
+  patients.push({
+    id: patients.length + 1,
     name: `Paciente ${index}`,
-    lastName: "De Prueba",
+    last_name: "De Prueba",
     email: `paciente.prueba${index}@rehabhur.com`,
     dni: String(47_000_000 + index),
-    comision: 2024 + (index % 3)
+    commission: 2024 + (index % 3)
   });
 }

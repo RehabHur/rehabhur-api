@@ -1,0 +1,72 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+model Teacher {
+  id         Int    @id @default(autoincrement())
+  name       String
+  last_name  String
+  email      String @unique
+  dni        String @unique
+  commission Int
+
+  @@map("teachers")
+}
+
+
+model Patient {
+  id         Int    @id @default(autoincrement())
+  name       String
+  last_name  String
+  email      String @unique
+  dni        String @unique
+  commission Int
+
+  @@map("patients")
+}
+
+
+enum Role {
+  admin
+  docente
+  estudiante
+  paciente
+}
+
+model Person {
+  id          Int    @id @default(autoincrement())
+  firstName   String
+  lastName    String @map("last_name")
+  email       String @unique
+  dni         String @unique
+  nationality String
+  role        Role 
+
+  @@map("persons")
+}
+
+
+model Exercise {
+  id           Int    @id @default(autoincrement())
+  name         String
+  bodyRegion   String
+  motionType   String
+  material     String
+  linkVideo    String @unique
+  instructions String
+
+
+  @@unique([name, bodyRegion])
+  @@map("exercises")
+}

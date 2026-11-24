@@ -1,76 +1,95 @@
 import { Exercise } from "../models/exercise.model.js";
+import { getPrismaClient } from "../lib/prisma.js";
 import { exercises } from "../mocks/exercise.mock.js";
-import { CreateExerciseDto, UpdateExerciseDto } from "../schemas/exercise.schema.js";
+import {
+  CreateExerciseDto,
+  UpdateExerciseDto,
+} from "../schemas/exercise.schema.js";
 
 export class ExerciseRepository {
-    //la url en la db sera un atributo unico
-    findByLinkVideo(linkVideo: string): Exercise | undefined {
-        const exercise = exercises.find((item) => item.linkVideo === linkVideo);
-        return exercise ? { ...exercise } : undefined;
+  async findByLinkVideo(linkVideo: string): Promise<Exercise | null> {
+    if (process.env.NODE_ENV === "test") {
+      const exercise = exercises.find((item) => item.linkVideo === linkVideo);
+      return exercise ? { ...exercise } : null;
     }
 
-    // El name y la bodyRegion seran un atributo compuesto unico que no se podra repetir
-    //podemos tener un mismo nombre pero podra diferir la region o vicebersa
-    findByNameAndBodyRegion(name: string, bodyRegion: string): Exercise | undefined {
-        const exercise = exercises.find(
-            (item) => item.name === name && item.bodyRegion === bodyRegion
-        );
-        return exercise ? { ...exercise } : undefined;
+    return getPrismaClient().exercise.findUnique({ where: { linkVideo } });
+  }
+
+  async findByNameAndBodyRegion(
+    name: string,
+    bodyRegion: string,
+  ): Promise<Exercise | null> {
+    if (process.env.NODE_ENV === "test") {
+      const exercise = exercises.find((item) =>
+        item.name === name && item.bodyRegion === bodyRegion,
+      );
+      return exercise ? { ...exercise } : null;
     }
 
+    return getPrismaClient().exercise.findFirst({
+      where: { name, bodyRegion },
+    });
+  }
 
-    findAll(): Exercise[] {
-        return exercises.map((exercise) => ({ ...exercise }));
+  async findAll(): Promise<Exercise[]> {
+    if (process.env.NODE_ENV === "test") {
+      return exercises.map((exercise) => ({ ...exercise }));
     }
 
-    findById(id: number): Exercise | undefined {
-        const exercise = exercises.find((item) => item.id === id);
-        return exercise ? { ...exercise } : undefined;
+    return getPrismaClient().exercise.findMany();
+  }
+
+  async findById(id: number): Promise<Exercise | null> {
+    if (process.env.NODE_ENV === "test") {
+      const exercise = exercises.find((item) => item.id === id);
+      return exercise ? { ...exercise } : null;
     }
 
-    create(data: CreateExerciseDto): Exercise {
-        const id = exercises.length
-            ? Math.max(...exercises.map((exercise) => exercise.id)) + 1
-            : 1;
+    return getPrismaClient().exercise.findUnique({ where: { id } });
+  }
 
-        const exercise: Exercise = {
-            id,
-            name: data.name,
-            bodyRegion: data.bodyRegion,
-            motionType: data.motionType,
-            material: data.material,
-            linkVideo: data.linkVideo,
-            instructions: data.instructions,
-        };
-
-        exercises.push(exercise);
-        return { ...exercise };
+  async create(data: CreateExerciseDto): Promise<Exercise> {
+    if (process.env.NODE_ENV === "test") {
+      const id = exercises.length
+        ? Math.max(...exercises.map((exercise) => exercise.id)) + 1
+        : 1;
+      const exercise = { id, ...data };
+      exercises.push(exercise);
+      return { ...exercise };
     }
 
-    update(id: number, data: UpdateExerciseDto): Exercise | undefined {
-        const index = exercises.findIndex((exercise) => exercise.id === id);
-        if (index === -1) return undefined;
+    return getPrismaClient().exercise.create({ data });
+  }
 
-        const updated: Exercise = {
-            ...exercises[index],
-            ...(data.name !== undefined && { name: data.name }),
-            ...(data.bodyRegion !== undefined && { bodyRegion: data.bodyRegion }),
-            ...(data.motionType !== undefined && { motionType: data.motionType }),
-            ...(data.material !== undefined && { material: data.material }),
-            ...(data.linkVideo !== undefined && { linkVideo: data.linkVideo }),
-            ...(data.instructions !== undefined && { instructions: data.instructions }),
-        };
+  async update(id: number, data: UpdateExerciseDto): Promise<Exercise> {
+    if (process.env.NODE_ENV === "test") {
+      const index = exercises.findIndex((exercise) => exercise.id === id);
+      if (index === -1) {
+        throw new Error("No se encontró el ejercicio de prueba");
+      }
 
-        exercises[index] = updated;
-
-        return { ...updated };
+      exercises[index] = { ...exercises[index]!, ...data };
+      return { ...exercises[index]! };
     }
 
-    delete(id: number): Exercise | undefined {
-        const index = exercises.findIndex((exercise) => exercise.id === id);
-        if (index === -1) return undefined;
+    return getPrismaClient().exercise.update({
+      where: { id },
+      data,
+    });
+  }
 
-        const [deleted] = exercises.splice(index, 1);
-        return deleted ? { ...deleted } : undefined;
+  async delete(id: number): Promise<Exercise> {
+    if (process.env.NODE_ENV === "test") {
+      const index = exercises.findIndex((exercise) => exercise.id === id);
+      if (index === -1) {
+        throw new Error("No se encontró el ejercicio de prueba");
+      }
+
+      const [deleted] = exercises.splice(index, 1);
+      return { ...deleted! };
     }
+
+    return getPrismaClient().exercise.delete({ where: { id } });
+  }
 }

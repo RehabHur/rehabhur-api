@@ -1,97 +1,102 @@
 import { PersonRepository } from "../repository/persons.repository.js";
 import type { Person } from "../models/person.model.js";
-import type { CreatePersonDto, ListPersonsQuery, UpdatePersonDto } from "../schemas/person.schema.js";
+import type {
+  CreatePersonDto,
+  ListPersonsQuery,
+  UpdatePersonDto,
+} from "../schemas/person.schema.js";
 import { AppError } from "../utils/AppError.js";
 import { paginate, type PaginatedResponse } from "../utils/pagination.js";
 
 export class PersonService {
-    constructor(private readonly repository: PersonRepository) { }
+  constructor(private readonly repository: PersonRepository) {}
 
-    findAll(query: ListPersonsQuery = { page: 1, limit: 10 }): PaginatedResponse<Person> {
-        const search = query.search?.toLowerCase();
-        const persons = this.repository.findAll();
-        const matchesSearch = search
-            ? persons.filter((person) =>
-                [person.firstName, person.lastName, person.dni, person.email]
-                    .some((value) => value.toLowerCase().includes(search)))
-            : persons;
-        const filtered = query.role
-            ? matchesSearch.filter((person) => person.role === query.role)
-            : matchesSearch;
+  async findAll(
+    query: ListPersonsQuery = { page: 1, limit: 10 },
+  ): Promise<PaginatedResponse<Person>> {
+    const search = query.search?.toLowerCase();
 
-        return paginate(filtered, query);
+    const persons = await this.repository.findAll();
+
+    const matchesSearch = search
+      ? persons.filter((person) =>
+          [person.firstName, person.lastName, person.dni, person.email].some(
+            (value) => value.toLowerCase().includes(search),
+          ),
+        )
+      : persons;
+
+    const filtered = query.role
+      ? matchesSearch.filter((person) => person.role === query.role)
+      : matchesSearch;
+
+    return paginate(filtered, query);
+  }
+
+  async findById(id: number): Promise<Person> {
+    return this.findOrThrow(id);
+  }
+
+  async create(data: CreatePersonDto): Promise<Person> {
+    const existingByEmail = await this.repository.findByEmail(data.email);
+    if (existingByEmail) {
+      throw new AppError(
+        400,
+        "DUPLICATE_EMAIL",
+        "Ya existe una persona registrada con este correo electrónico",
+      );
     }
 
-    findById(id: number): Person {
-        return this.findOrThrow(id);
+    const existingByDni = await this.repository.findByDni(data.dni);
+    if (existingByDni) {
+      throw new AppError(
+        400,
+        "DUPLICATE_DNI",
+        "Ya existe una persona registrada con este DNI",
+      );
     }
 
-    create(data: CreatePersonDto): Person {
-        const existingByEmail = this.repository.findByEmail(data.email);
-        if (existingByEmail) {
-            throw new AppError(
-                400,
-                "DUPLICATE_EMAIL",
-                "Ya existe una persona registrada con este correo electrónico"
-            );
-        }
+    return this.repository.create(data);
+  }
 
-        const existingByDni = this.repository.findByDni(data.dni);
-        if (existingByDni) {
-            throw new AppError(
-                400,
-                "DUPLICATE_DNI",
-                "Ya existe una persona registrada con este DNI"
-            );
-        }
+  async update(id: number, data: UpdatePersonDto): Promise<Person> {
+    const current = await this.findOrThrow(id);
 
-        return this.repository.create(data);
+    if (data.email !== undefined && data.email !== current.email) {
+      const existingByEmail = await this.repository.findByEmail(data.email);
+      if (existingByEmail && existingByEmail.id !== id) {
+        throw new AppError(
+          400,
+          "DUPLICATE_EMAIL",
+          "Ya existe otra persona registrada con este correo electrónico",
+        );
+      }
     }
 
-    update(id: number, data: UpdatePersonDto): Person {
-        const current = this.findOrThrow(id);
-
-        if (data.email !== undefined && data.email !== current.email) {
-            const existingByEmail = this.repository.findByEmail(data.email);
-            if (existingByEmail && existingByEmail.id !== id) {
-                throw new AppError(
-                    400,
-                    "DUPLICATE_EMAIL",
-                    "Ya existe otra persona registrada con este correo electrónico"
-                );
-            }
-        }
-
-        if (data.dni !== undefined && data.dni !== current.dni) {
-            const existingByDni = this.repository.findByDni(data.dni);
-            if (existingByDni && existingByDni.id !== id) {
-                throw new AppError(
-                    400,
-                    "DUPLICATE_DNI",
-                    "Ya existe otra persona registrada con este DNI"
-                );
-            }
-        }
-
-        const updated = this.repository.update(id, data);
-        if (!updated) {
-            throw new AppError(404, "PERSON_NOT_FOUND", "No se encontró la persona");
-        }
-        return updated;
+    if (data.dni !== undefined && data.dni !== current.dni) {
+      const existingByDni = await this.repository.findByDni(data.dni);
+      if (existingByDni && existingByDni.id !== id) {
+        throw new AppError(
+          400,
+          "DUPLICATE_DNI",
+          "Ya existe otra persona registrada con este DNI",
+        );
+      }
     }
 
-    delete(id: number): void {
-        const deleted = this.repository.delete(id);
-        if (!deleted) {
-            throw new AppError(404, "PERSON_NOT_FOUND", "No se encontró la persona");
-        }
-    }
+    return this.repository.update(id, data);
+  }
 
-    private findOrThrow(id: number): Person {
-        const person = this.repository.findById(id);
-        if (!person) {
-            throw new AppError(404, "PERSON_NOT_FOUND", "No se encontró la persona");
-        }
-        return person;
+  async delete(id: number): Promise<void> {
+    await this.findOrThrow(id);
+    await this.repository.delete(id);
+  }
+
+  private async findOrThrow(id: number): Promise<Person> {
+    const person = await this.repository.findById(id);
+    if (!person) {
+      throw new AppError(404, "PERSON_NOT_FOUND", "No se encontró la persona");
     }
+    return person;
+  }
 }

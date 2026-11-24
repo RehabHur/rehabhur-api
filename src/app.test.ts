@@ -92,6 +92,18 @@ describe("API de rehabilitación", () => {
       .patch(`/api/v1/patients/${patients.body.data[0].id}`)
       .send({ name: originalName });
     expect(restored.body.name).toBe(originalName);
+
+    const invalidUpdate = await request(app)
+      .patch(`/api/v1/patients/${patients.body.data[0].id}`)
+      .send({ email: "correo-inválido" });
+    expect(invalidUpdate.status).toBe(400);
+    expect(invalidUpdate.body.error.code).toBe("VALIDATION_ERROR");
+
+    const attemptedIdChange = await request(app)
+      .patch(`/api/v1/patients/${patients.body.data[0].id}`)
+      .send({ id: 999, name: "Paciente actualizado" });
+    expect(attemptedIdChange.status).toBe(200);
+    expect(attemptedIdChange.body.id).toBe(patients.body.data[0].id);
   });
 
   it("permite crear, consultar, actualizar y eliminar personas", async () => {
@@ -148,6 +160,14 @@ describe("API de rehabilitación", () => {
     });
     expect(secondPage.body.data).toHaveLength(5);
     expect(secondPage.body.data[0].id).not.toBe(firstPage.body.data[0].id);
+  });
+
+  it("mantiene único el email del administrador en el listado de personas", async () => {
+    const response = await request(app)
+      .get("/api/v1/persons?search=admin%40rehabhur.com");
+
+    expect(response.status).toBe(200);
+    expect(response.body.data).toHaveLength(1);
   });
 
   it("usa page=1 y limit=10 por defecto", async () => {

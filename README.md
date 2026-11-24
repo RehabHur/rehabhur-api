@@ -9,9 +9,10 @@ npm install
 npm run dev
 ```
 
-Copiar `.env.example` a `.env` y completar `JWT_SECRET` con una clave Base64 de
-32 bytes. El servidor escucha en `http://localhost:3000` (configurable con
-`PORT`).
+Copiar `.env.example` a `.env`. Las variables opcionales están vacías y usan
+los valores predeterminados del proyecto; `JWT_SECRET` debe configurarse con
+una clave Base64 de 32 bytes para iniciar la API. El servidor escucha en
+`http://localhost:3000` (configurable con `PORT`).
 
 Verificación:
 
@@ -23,11 +24,27 @@ npm run build
 
 ## Variables de entorno
 
-Copiar `.env.example` a `.env` y completar:
+Copiar `.env.example` a `.env`. Las variables disponibles son:
 
 - `JWT_SECRET`: clave Base64 de 32 bytes (256 bits).
 - `JWT_ACCESS_TTL`: duración del access token (por defecto `15m`).
 - `JWT_REFRESH_TTL`: duración del refresh token (por defecto `7d`).
+- `PORT`: puerto HTTP (por defecto `3000`).
+- `REFRESH_COOKIE_NAME` y `REFRESH_COOKIE_PATH`: nombre y ruta de la cookie.
+- `COOKIE_SAME_SITE`, `COOKIE_SECURE` y `COOKIE_DOMAIN`: atributos de cookie.
+- `CORS_ORIGIN`: orígenes permitidos, separados por coma.
+- `IMAGE_TAG`: etiqueta de imagen Docker (por defecto `latest`).
+- `DATABASE_URL`: URL de conexión PostgreSQL (opcional si se configuran las
+  variables `PG*`).
+- `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, `PGPASSWORD` y `PGSSLMODE`:
+  parámetros de conexión alternativos para PostgreSQL. Usa `PGSSLMODE=require`
+  si el proveedor exige TLS.
+- `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` y `POSTGRES_PORT`:
+  configuración de la base de datos del servicio Docker Compose. Completa estos
+  valores en `.env`; el puerto publicado se limita a `127.0.0.1`.
+
+Antes de iniciar la API, aplicar las migraciones con `npm run db:migrate`.
+Durante `npm install` se genera el cliente Prisma automáticamente.
 
 ## Rutas
 
@@ -46,7 +63,8 @@ Copiar `.env.example` a `.env` y completar:
 - `GET /api/v1/auth/profile`
 - `GET /api/v1/users`, `POST /api/v1/users` (solo administradores)
 
-Los datos se almacenan en memoria y se reinician con el proceso.
+Docentes, pacientes, personas y ejercicios se almacenan en PostgreSQL. Las
+cuentas de usuario y los refresh tokens todavía se mantienen en memoria.
 
 ## Paginación
 
@@ -124,8 +142,9 @@ docker build -t ghcr.io/rehabhur/rehabhur-api:local .
 docker run --rm -p 3000:3000 --env-file .env ghcr.io/rehabhur/rehabhur-api:local
 ```
 
-También se puede usar Docker Compose. Copiar `.env.example` a `.env`, completar
-`JWT_SECRET` y ejecutar:
+También se puede usar Docker Compose. Copiar `.env.example` a `.env` y
+configurar `JWT_SECRET`, `POSTGRES_USER`, `POSTGRES_PASSWORD` y `POSTGRES_DB`;
+el puerto PostgreSQL puede ajustarse con `POSTGRES_PORT`. Luego ejecutar:
 
 ```sh
 docker compose up --build
@@ -143,9 +162,7 @@ El workflow `.github/workflows/build.yml` corre en pull requests y push a
 2. Construye la imagen Docker.
 3. Publica la imagen en GitHub Container Registry solo en push.
 
-Configurar el secreto `JWT_SECRET` en GitHub Actions con una clave Base64
-válida de 32 bytes. Los tests de ambos workflows lo requieren; los pull
-requests desde forks no reciben secretos del repositorio.
+Los tests usan una clave exclusiva de prueba y no requieren secretos de GitHub.
 
 Tags publicados:
 

@@ -1,121 +1,60 @@
-import { Request, Response } from "express";
-import { patiens } from "../mocks/patient.mock.js";
-import { listPatientsQuerySchema } from "../schemas/patient.schema.js";
-import { parseListQuery } from "../middlewares/validate.js";
-import { paginate } from "../utils/pagination.js";
+import type { Request, Response } from "express";
 
+import { toPatientResponseDto, type PatientResponseDto } from "../dtos/patient-response.dto.js";
+import { parseListQuery } from "../middlewares/validate.js";
+import type {
+  CreatePatientDto,
+  ListPatientsQuery,
+  UpdatePatientDto,
+} from "../schemas/patient.schema.js";
+import { listPatientsQuerySchema } from "../schemas/patient.schema.js";
+import { PatientService } from "../services/patient.service.js";
+import type { PaginatedResponse } from "../utils/pagination.js";
 
 export class PatientController {
-  getAllPacients = (req: Request, res: Response): void => {
-    const query = parseListQuery(listPatientsQuerySchema, req.query);
-    const search = query.search?.toLowerCase();
-    const patients = search
-      ? patiens.filter((patient) =>
-        [patient.name, patient.lastName, patient.email, patient.dni]
-          .some((value) => value.toLowerCase().includes(search)))
-      : patiens;
+  constructor(private readonly service: PatientService) {}
 
-    res.status(200).json(paginate(patients, query));
+  findAll = async (
+    req: Request,
+    res: Response<PaginatedResponse<PatientResponseDto>>,
+  ): Promise<void> => {
+    const query: ListPatientsQuery = parseListQuery(listPatientsQuerySchema, req.query);
+    const result = await this.service.findAll(query);
+    res.status(200).json({
+      data: result.data.map(toPatientResponseDto),
+      meta: result.meta,
+    });
   };
 
-  getPacientById = async (req: Request<{ id: string }>, res: Response): Promise<Response> => {
-    try {
-      const id = Number(req.params.id);
-
-      if (isNaN(id)) {
-        return res.status(400).json({ message: "El id debe ser numérico" });
-      }
-
-      const pacient = patiens.find((p) => p.id === id);
-
-      if (!pacient) {
-        return res.status(404).json({ message: `El paciente con id ${id} no se encuentra.` });
-      }
-
-      return res.status(200).json(pacient);
-    } catch (error) {
-      return res.status(500).json({ message: "Error en el servidor", error });
-    }
-  };
-
-  /*
-  export const createPacient = async (req: Request<{}, {}, {}>, res: Response): Promise<Response> => {
-    try {
-      const { name, lastName, email, dni, comision } = req.body;
-  
-      //TODO: Corregir validación de campos obligatorios para que no permita crear un paciente con campos vacíos
-      if (!name || !lastName || !email || !dni || !comision) {
-        return res.status(400).json({ message: "Faltan campos obligatorios" });
-      }
-  
-      const newId = patiens.length > 0 ? Math.max(...patiens.map((p) => p.id)) + 1 : 1;
-  
-      const newPacient: Patient = {
-        id: newId,
-        name,
-        lastName,
-        email,
-        dni,
-        comision,
-      };
-  
-      patiens.push(newPacient);
-  
-      return res.status(201).json(newPacient);
-    } catch (error) {
-      return res.status(500).json({ message: "Error en el servidor", error });
-    }
-  };
-  */
-
-  updatePacient = async (req: Request<{ id: string }, {}, {}>, res: Response): Promise<Response> => {
-    try {
-      const id = Number(req.params.id);
-
-      if (isNaN(id)) {
-        return res.status(400).json({ message: "El id debe ser numérico" });
-      }
-
-      const index = patiens.findIndex((p) => p.id === id);
-
-      if (index === -1) {
-        return res.status(404).json({ message: `No se encontró ningún paciente con id ${id}` });
-      }
-
-      patiens[index] = {
-        ...patiens[index],
-        ...req.body,
-      };
-
-      return res.status(200).json(patiens[index]);
-    } catch (error) {
-      return res.status(500).json({ message: "Error en el servidor", error });
-    }
-  };
-
-  deletePacientById = async (
+  findById = async (
     req: Request<{ id: string }>,
-    res: Response
-  ): Promise<Response> => {
-    try {
-      const id = Number(req.params.id);
+    res: Response<PatientResponseDto>,
+  ): Promise<void> => {
+    const patient = await this.service.findById(Number(req.params.id));
+    res.status(200).json(toPatientResponseDto(patient));
+  };
 
-      if (isNaN(id)) {
-        return res.status(400).json({ message: "El id debe ser numérico" });
-      }
+  create = async (
+    req: Request<{}, PatientResponseDto, CreatePatientDto>,
+    res: Response<PatientResponseDto>,
+  ): Promise<void> => {
+    const created = await this.service.create(req.body);
+    res.status(201).json(toPatientResponseDto(created));
+  };
 
-      const index = patiens.findIndex((p) => p.id === id);
+  update = async (
+    req: Request<{ id: string }, PatientResponseDto, UpdatePatientDto>,
+    res: Response<PatientResponseDto>,
+  ): Promise<void> => {
+    const updated = await this.service.update(Number(req.params.id), req.body);
+    res.status(200).json(toPatientResponseDto(updated));
+  };
 
-      if (index === -1) {
-        return res.status(404).json({ message: `El id ${id} no se encuentra.` });
-      }
-
-      const [deletedPacient] = patiens.splice(index, 1);
-
-      return res.status(200).json({ message: "Paciente eliminado correctamente", pacient: deletedPacient });
-    } catch (error) {
-      return res.status(500).json({ message: "Error en el servidor", error });
-    }
+  delete = async (
+    req: Request<{ id: string }>,
+    res: Response,
+  ): Promise<void> => {
+    await this.service.delete(Number(req.params.id));
+    res.status(204).end();
   };
 }
-

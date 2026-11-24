@@ -7,7 +7,7 @@ const sameSiteValues = ["lax", "strict", "none"] as const;
 type SameSite = (typeof sameSiteValues)[number];
 
 const parseSameSite = (value: string | undefined): SameSite => {
-    const normalized = (value ?? "lax").trim().toLowerCase();
+    const normalized = value?.trim().toLowerCase() || "lax";
 
     if (!sameSiteValues.includes(normalized as SameSite)) {
         throw new Error("COOKIE_SAME_SITE debe ser lax, strict o none");
@@ -17,7 +17,7 @@ const parseSameSite = (value: string | undefined): SameSite => {
 };
 
 const parseBoolean = (value: string | undefined, fallback: boolean): boolean => {
-    if (value === undefined) {
+    if (value === undefined || value.trim() === "") {
         return fallback;
     }
 

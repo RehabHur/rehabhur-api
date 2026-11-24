@@ -8,32 +8,32 @@ import type { PaginatedResponse } from "../utils/pagination.js";
 export class PersonController {
   constructor(private readonly service: PersonService) {}
 
-  findAll = (req: Request, res: Response<PaginatedResponse<PersonResponseDto>>): void => {
+  findAll = async (req: Request, res: Response<PaginatedResponse<PersonResponseDto>>): Promise<void> => {
     const query = parseListQuery(listPersonsQuerySchema, req.query);
-    const result = this.service.findAll(query);
+    const result = await this.service.findAll(query);
     res.status(200).json({
       data: result.data.map(toPersonResponseDto),
       meta: result.meta,
     });
   };
 
-  findById = (req: Request<{ id: string }>, res: Response<PersonResponseDto>): void => {
-    const person = this.service.findById(Number(req.params.id));
+  findById = async (req: Request<{ id: string }>, res: Response<PersonResponseDto>): Promise<void> => {
+    const person = await this.service.findById(Number(req.params.id));
     res.status(200).json(toPersonResponseDto(person));
   };
 
-  create = (req: Request<{}, PersonResponseDto, CreatePersonDto>, res: Response<PersonResponseDto>): void => {
-    const created = this.service.create(req.body);
+  create = async (req: Request<{}, PersonResponseDto, CreatePersonDto>, res: Response<PersonResponseDto>): Promise<void> => {
+    const created = await this.service.create(req.body);
     res.status(201).json(toPersonResponseDto(created));
   };
 
-  update = (req: Request<{ id: string }, PersonResponseDto, UpdatePersonDto>, res: Response<PersonResponseDto>): void => {
-    const updated = this.service.update(Number(req.params.id), req.body);
+  update = async (req: Request<{ id: string }, PersonResponseDto, UpdatePersonDto>, res: Response<PersonResponseDto>): Promise<void> => {
+    const updated = await this.service.update(Number(req.params.id), req.body); // 👈 await
     res.status(200).json(toPersonResponseDto(updated));
   };
 
-  delete = (req: Request<{ id: string }>, res: Response): void => {
-    this.service.delete(Number(req.params.id));
+  delete = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
+    await this.service.delete(Number(req.params.id));
     res.status(204).end();
   };
 }

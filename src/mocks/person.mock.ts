@@ -14,15 +14,6 @@ const usersAsPersons: Person[] = users.map((user, index) => ({
 const admins: Person[] = [
     {
         id: usersAsPersons.length + 1,
-        firstName: "Usuario",
-        lastName: "Administrador",
-        dni: "30111222",
-        email: "admin@rehabhur.com",
-        nationality: "Argentina",
-        role: "admin",
-    },
-    {
-        id: usersAsPersons.length + 2,
         firstName: "Coordinación",
         lastName: "Académica",
         dni: "28333444",

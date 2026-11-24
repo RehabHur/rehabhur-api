@@ -36,8 +36,6 @@ jobs:
 
       - name: Run tests
         run: npm test
-        env:
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
       - name: Build project
         run: npm run build

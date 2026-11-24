@@ -14,16 +14,18 @@ const toCreateDto = (exercise: Exercise): CreateExerciseDto => ({
     instructions: exercise.instructions,
 });
 
-const getTwoExercises = (repository: ExerciseRepository): [Exercise, Exercise] => {
-    const [first, second] = repository.findAll();
+const getTwoExercises = async (repository: ExerciseRepository): Promise<[Exercise, Exercise]> => {
+    const [first, second] = await repository.findAll();
     if (!first || !second) {
         throw new Error("Se necesitan al menos dos ejercicios para ejecutar estas pruebas");
     }
     return [first, second];
 };
 
-const getExercisesWithSameRegion = (repository: ExerciseRepository): [Exercise, Exercise] => {
-    const exercises = repository.findAll();
+const getExercisesWithSameRegion = async (
+    repository: ExerciseRepository,
+): Promise<[Exercise, Exercise]> => {
+    const exercises = await repository.findAll();
     const current = exercises.find((exercise, index) =>
         exercises.slice(index + 1).some((other) =>
             other.bodyRegion === exercise.bodyRegion && other.name !== exercise.name,
@@ -41,9 +43,9 @@ const getExercisesWithSameRegion = (repository: ExerciseRepository): [Exercise, 
 };
 
 describe("ExerciseService", () => {
-    it("debería devolver la lista de ejercicios disponibles", () => {
+    it("debería devolver la lista de ejercicios disponibles", async () => {
         const service = new ExerciseService(new ExerciseRepository());
-        const exercises = service.findAll().data;
+        const exercises = (await service.findAll()).data;
 
         expect(Array.isArray(exercises)).toBe(true);
         expect(exercises.length).toBeGreaterThan(0);
@@ -58,19 +60,19 @@ describe("ExerciseService", () => {
         });
     });
 
-    it("mantiene únicas las URL y las combinaciones de nombre y región existentes", () => {
-        const exercises = new ExerciseService(new ExerciseRepository()).findAll().data;
+    it("mantiene únicas las URL y las combinaciones de nombre y región existentes", async () => {
+        const exercises = (await new ExerciseService(new ExerciseRepository()).findAll()).data;
 
         expect(new Set(exercises.map((exercise) => exercise.linkVideo)).size).toBe(exercises.length);
         expect(new Set(exercises.map((exercise) => `${exercise.name}\0${exercise.bodyRegion}`)).size)
             .toBe(exercises.length);
     });
 
-    it("permite crear un ejercicio que cumple las reglas de unicidad", () => {
+    it("permite crear un ejercicio que cumple las reglas de unicidad", async () => {
         const repository = new ExerciseRepository();
         const service = new ExerciseService(repository);
-        const [existing] = getTwoExercises(repository);
-        const created = service.create({
+        const [existing] = await getTwoExercises(repository);
+        const created = await service.create({
             ...toCreateDto(existing),
             name: "Ejercicio de prueba único",
             bodyRegion: "Región de prueba",
@@ -78,90 +80,90 @@ describe("ExerciseService", () => {
         });
 
         expect(created.id).toEqual(expect.any(Number));
-        expect(service.delete(created.id)).toBeUndefined();
+        await expect(service.delete(created.id)).resolves.toBeUndefined();
     });
 
-    it("rechaza la creación de ejercicios con una URL de video duplicada", () => {
+    it("rechaza la creación de ejercicios con una URL de video duplicada", async () => {
         const repository = new ExerciseRepository();
         const service = new ExerciseService(repository);
-        const [existing] = getTwoExercises(repository);
+        const [existing] = await getTwoExercises(repository);
         const data = {
             ...toCreateDto(existing),
             name: "Ejercicio con otro nombre",
             bodyRegion: "Otra región",
         };
 
-        expect(() => service.create(data)).toThrowError(
+        await expect(service.create(data)).rejects.toThrowError(
             expect.objectContaining({ statusCode: 409, code: "DUPLICATE_LINK_VIDEO" }),
         );
     });
 
-    it("rechaza la creación de ejercicios con nombre y región duplicados", () => {
+    it("rechaza la creación de ejercicios con nombre y región duplicados", async () => {
         const repository = new ExerciseRepository();
         const service = new ExerciseService(repository);
-        const [existing] = getTwoExercises(repository);
+        const [existing] = await getTwoExercises(repository);
         const data = {
             ...toCreateDto(existing),
             linkVideo: "https://www.youtube.com/watch?v=ejercicio-nuevo",
         };
 
-        expect(() => service.create(data)).toThrowError(
+        await expect(service.create(data)).rejects.toThrowError(
             expect.objectContaining({ statusCode: 409, code: "DUPLICATE_EXERCISE" }),
         );
     });
 
-    it("rechaza actualizar un ejercicio con la URL de video de otro", () => {
+    it("rechaza actualizar un ejercicio con la URL de video de otro", async () => {
         const repository = new ExerciseRepository();
         const service = new ExerciseService(repository);
-        const [current, other] = getTwoExercises(repository);
+        const [current, other] = await getTwoExercises(repository);
 
-        expect(() => service.update(current.id, { linkVideo: other.linkVideo })).toThrowError(
+        await expect(service.update(current.id, { linkVideo: other.linkVideo })).rejects.toThrowError(
             expect.objectContaining({ statusCode: 409, code: "DUPLICATE_LINK_VIDEO" }),
         );
     });
 
-    it("rechaza actualizar un ejercicio con el nombre y región de otro", () => {
+    it("rechaza actualizar un ejercicio con el nombre y región de otro", async () => {
         const repository = new ExerciseRepository();
         const service = new ExerciseService(repository);
-        const [current, other] = getTwoExercises(repository);
+        const [current, other] = await getTwoExercises(repository);
 
-        expect(() => service.update(current.id, {
+        await expect(service.update(current.id, {
             name: other.name,
             bodyRegion: other.bodyRegion,
-        })).toThrowError(
+        })).rejects.toThrowError(
             expect.objectContaining({ statusCode: 409, code: "DUPLICATE_EXERCISE" }),
         );
     });
 
-    it("rechaza una actualización parcial que genera un nombre y región duplicados", () => {
+    it("rechaza una actualización parcial que genera un nombre y región duplicados", async () => {
         const repository = new ExerciseRepository();
         const service = new ExerciseService(repository);
-        const [current, other] = getExercisesWithSameRegion(repository);
+        const [current, other] = await getExercisesWithSameRegion(repository);
 
-        expect(() => service.update(current.id, { name: other.name })).toThrowError(
+        await expect(service.update(current.id, { name: other.name })).rejects.toThrowError(
             expect.objectContaining({ statusCode: 409, code: "DUPLICATE_EXERCISE" }),
         );
     });
 
-    it("permite conservar la unicidad del mismo ejercicio al actualizarlo", () => {
+    it("permite conservar la unicidad del mismo ejercicio al actualizarlo", async () => {
         const repository = new ExerciseRepository();
         const service = new ExerciseService(repository);
-        const [existing] = getTwoExercises(repository);
+        const [existing] = await getTwoExercises(repository);
 
-        expect(service.update(existing.id, {
+        await expect(service.update(existing.id, {
             name: existing.name,
             bodyRegion: existing.bodyRegion,
-        })).toMatchObject({
+        })).resolves.toMatchObject({
             id: existing.id,
             name: existing.name,
             bodyRegion: existing.bodyRegion,
         });
     });
 
-    it("devuelve un error 404 al buscar un ejercicio inexistente", () => {
+    it("devuelve un error 404 al buscar un ejercicio inexistente", async () => {
         const service = new ExerciseService(new ExerciseRepository());
 
-        expect(() => service.findById(Number.MAX_SAFE_INTEGER)).toThrowError(
+        await expect(service.findById(Number.MAX_SAFE_INTEGER)).rejects.toThrowError(
             expect.objectContaining({ statusCode: 404, code: "EXERCISE_NOT_FOUND" }),
         );
     });

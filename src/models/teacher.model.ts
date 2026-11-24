@@ -6,3 +6,4 @@ export interface Teacher {
     dni: string;
     commission: number;
 }
+
