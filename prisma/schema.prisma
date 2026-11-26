@@ -19,7 +19,7 @@ model Teacher {
   last_name  String
   email      String @unique
   dni        String @unique
-  commission Int
+  commissions Commission[]
 
   @@map("teachers")
 }
@@ -69,4 +69,18 @@ model Exercise {
 
   @@unique([name, bodyRegion])
   @@map("exercises")
+}
+
+
+model Commission {
+  id           Int      @id @default(autoincrement())
+  name         String   @unique 
+  year         Int
+  turno        String   // "Mañana", "Tarde", "Noche"
+  cuatrimestre Int      // 1 o 2
+  createdAt    DateTime @default(now())
+
+  teachers  Teacher[]
+
+  @@map("commissions")
 }

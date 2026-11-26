@@ -4,7 +4,6 @@ import { getPrismaClient } from "../lib/prisma.js";
 import {
   CreateTeacherDto,
   UpdateTeacherDto,
-  ListTeachersQuery,
 } from "../schemas/teacher.schema.js";
 
 export class TeacherRepository {
@@ -15,8 +14,6 @@ export class TeacherRepository {
 
     return getPrismaClient().teacher.findMany();
   }
-
-
 
   async findByEmail(email: string): Promise<Teacher | null> {
     if (process.env.NODE_ENV === "test") {
@@ -40,25 +37,43 @@ export class TeacherRepository {
     });
   }
 
-
   async findById(id: number): Promise<Teacher | null> {
     if (process.env.NODE_ENV === "test") {
       const teacher = teachers.find((item) => item.id === id);
       return teacher ? { ...teacher } : null;
     }
 
-    return getPrismaClient().teacher.findUnique({ where: { id } });
+    return getPrismaClient().teacher.findUnique({
+      where: { id },
+      include: { commissions: true },
+    });
   }
 
   async create(data: CreateTeacherDto): Promise<Teacher> {
     if (process.env.NODE_ENV === "test") {
-      const id = teachers.length ? Math.max(...teachers.map((teacher) => teacher.id)) + 1 : 1;
+      const id = teachers.length
+        ? Math.max(...teachers.map((teacher) => teacher.id)) + 1
+        : 1;
       const teacher = { id, ...data };
       teachers.push(teacher);
       return { ...teacher };
     }
 
-    return getPrismaClient().teacher.create({ data });
+    const { commissionIds, ...teacherData } = data;
+
+    return getPrismaClient().teacher.create({
+      data: {
+        ...teacherData,
+
+        commissions:
+          commissionIds && commissionIds.length > 0
+            ? {
+                connect: commissionIds.map((id) => ({ id })),
+              }
+            : undefined,
+      },
+      include: { commissions: true },
+    });
   }
 
   async update(id: number, data: UpdateTeacherDto): Promise<Teacher> {
@@ -72,9 +87,19 @@ export class TeacherRepository {
       return { ...teachers[index]! };
     }
 
+    const { commissionIds, ...teacherData } = data;
+
     return getPrismaClient().teacher.update({
       where: { id },
-      data,
+      data: {
+        ...teacherData,
+        commissions: commissionIds
+          ? {
+              set: commissionIds.map((id) => ({ id })),
+            }
+          : undefined,
+      },
+      include: { commissions: true },
     });
   }
 

@@ -5,3 +5,4 @@ export { default as personRoutes } from "./person.routes.js";
 export { default as optionRoutes } from "./option.routes.js";
 export { default as userRoutes } from "./user.routes.js";
 export { default as authRoutes } from "./auth.routes.js";
+export { default as comissionRoutes } from "./comission.routes.js";
