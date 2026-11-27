@@ -116,4 +116,11 @@ export class TeacherRepository {
 
     return getPrismaClient().teacher.delete({ where: { id } });
   }
+
+
+  
 }
+
+
+
+

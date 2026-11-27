@@ -33,6 +33,8 @@ export class CommissionRepository {
     return getPrismaClient().commission.findUnique({ where: { name } });
   }
 
+
+
   async findByIds(ids: number[]): Promise<Commission[]> {
     if (ids.length === 0) return [];
 

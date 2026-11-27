@@ -39,29 +39,43 @@ export class TeacherService {
     return teacher;
   }
 
+
   async create(data: CreateTeacherDto): Promise<Teacher> {
-    const existingByEmail = await this.repository.findByEmail(data.email);
-    if (existingByEmail) {
-      throw new AppError(
-        400,
-        "DUPLICATE_EMAIL",
-        "Ya existe un docente registrado con este correo electrónico",
-      );
-    }
-
-    const existingByDni = await this.repository.findByDni(data.dni);
-    if (existingByDni) {
-      throw new AppError(
-        400,
-        "DUPLICATE_DNI",
-        "Ya existe un docente registrado con este DNI",
-      );
-    }
-
-    
-
-    return this.repository.create(data);
+  const existingByEmail = await this.repository.findByEmail(data.email);
+  if (existingByEmail) {
+    throw new AppError(
+      400,
+      "DUPLICATE_EMAIL",
+      "Ya existe un docente registrado con este correo electrónico",
+    );
   }
+
+  const existingByDni = await this.repository.findByDni(data.dni);
+  if (existingByDni) {
+    throw new AppError(
+      400,
+      "DUPLICATE_DNI",
+      "Ya existe un docente registrado con este DNI",
+    );
+  }
+
+  if (data.commissionIds && data.commissionIds.length > 0) {
+    const foundCommissions = await this.commissionRepository.findByIds(data.commissionIds);
+
+    if (foundCommissions.length !== data.commissionIds.length) {
+      const foundIds = new Set(foundCommissions.map((c) => c.id));
+      const missingIds = data.commissionIds.filter((id) => !foundIds.has(id));
+
+      throw new AppError(
+        404,
+        "COMMISSION_NOT_FOUND",
+        `Las siguientes comisiones no existen: ${missingIds.join(", ")}`,
+      );
+    }
+  }
+
+  return this.repository.create(data);
+}
 
   async update(id: number, data: UpdateTeacherDto): Promise<Teacher> {
     const current = await this.findById(id);
