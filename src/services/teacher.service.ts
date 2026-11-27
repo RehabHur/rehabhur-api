@@ -1,4 +1,5 @@
 import { TeacherRepository } from "../repository/teacher.repository.js";
+import { CommissionRepository } from "../repository/comission.repository.js";
 import { Teacher } from "../models/teacher.model.js";
 import {
   CreateTeacherDto,
@@ -9,7 +10,8 @@ import { AppError } from "../utils/AppError.js";
 import { paginate, type PaginatedResponse } from "../utils/pagination.js";
 
 export class TeacherService {
-  constructor(private readonly repository: TeacherRepository) {}
+  constructor(private readonly repository: TeacherRepository ,
+     private readonly commissionRepository: CommissionRepository) {}
 
   async findAll(
     query: ListTeachersQuery = { page: 1, limit: 10 },
@@ -55,6 +57,8 @@ export class TeacherService {
         "Ya existe un docente registrado con este DNI",
       );
     }
+
+    
 
     return this.repository.create(data);
   }

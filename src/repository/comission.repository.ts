@@ -1,7 +1,10 @@
 import { Commission } from "../models/comission.model.js";
 import { getPrismaClient } from "../lib/prisma.js";
 import { commissions } from "../mocks/comission.mock.js";
-import { CreateCommissionDto, UpdateCommissionDto } from "../schemas/comission.schema.js";
+import {
+  CreateCommissionDto,
+  UpdateCommissionDto,
+} from "../schemas/comission.schema.js";
 
 export class CommissionRepository {
   async findAll(): Promise<Commission[]> {
@@ -16,9 +19,9 @@ export class CommissionRepository {
       const commission = commissions.find((item) => item.id === id);
       return commission ? { ...commission } : null;
     }
-    return getPrismaClient().commission.findUnique({ 
+    return getPrismaClient().commission.findUnique({
       where: { id },
-      include: { teachers: true }
+      include: { teachers: true },
     });
   }
 
@@ -28,6 +31,22 @@ export class CommissionRepository {
       return commission ? { ...commission } : null;
     }
     return getPrismaClient().commission.findUnique({ where: { name } });
+  }
+
+  async findByIds(ids: number[]): Promise<Commission[]> {
+    if (ids.length === 0) return [];
+
+    if (process.env.NODE_ENV === "test") {
+      return commissions
+        .filter((item) => ids.includes(item.id))
+        .map((item) => ({ ...item }));
+    }
+
+    return getPrismaClient().commission.findMany({
+      where: {
+        id: { in: ids },
+      },
+    });
   }
 
   async create(data: CreateCommissionDto): Promise<Commission> {
