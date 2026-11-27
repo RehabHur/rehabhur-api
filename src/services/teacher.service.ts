@@ -10,8 +10,10 @@ import { AppError } from "../utils/AppError.js";
 import { paginate, type PaginatedResponse } from "../utils/pagination.js";
 
 export class TeacherService {
-  constructor(private readonly repository: TeacherRepository ,
-     private readonly commissionRepository: CommissionRepository) {}
+  constructor(
+    private readonly repository: TeacherRepository,
+    private readonly commissionRepository: CommissionRepository,
+  ) {}
 
   async findAll(
     query: ListTeachersQuery = { page: 1, limit: 10 },
@@ -39,43 +41,44 @@ export class TeacherService {
     return teacher;
   }
 
-
   async create(data: CreateTeacherDto): Promise<Teacher> {
-  const existingByEmail = await this.repository.findByEmail(data.email);
-  if (existingByEmail) {
-    throw new AppError(
-      400,
-      "DUPLICATE_EMAIL",
-      "Ya existe un docente registrado con este correo electrónico",
-    );
-  }
-
-  const existingByDni = await this.repository.findByDni(data.dni);
-  if (existingByDni) {
-    throw new AppError(
-      400,
-      "DUPLICATE_DNI",
-      "Ya existe un docente registrado con este DNI",
-    );
-  }
-
-  if (data.commissionIds && data.commissionIds.length > 0) {
-    const foundCommissions = await this.commissionRepository.findByIds(data.commissionIds);
-
-    if (foundCommissions.length !== data.commissionIds.length) {
-      const foundIds = new Set(foundCommissions.map((c) => c.id));
-      const missingIds = data.commissionIds.filter((id) => !foundIds.has(id));
-
+    const existingByEmail = await this.repository.findByEmail(data.email);
+    if (existingByEmail) {
       throw new AppError(
-        404,
-        "COMMISSION_NOT_FOUND",
-        `Las siguientes comisiones no existen: ${missingIds.join(", ")}`,
+        400,
+        "DUPLICATE_EMAIL",
+        "Ya existe un docente registrado con este correo electrónico",
       );
     }
-  }
 
-  return this.repository.create(data);
-}
+    const existingByDni = await this.repository.findByDni(data.dni);
+    if (existingByDni) {
+      throw new AppError(
+        400,
+        "DUPLICATE_DNI",
+        "Ya existe un docente registrado con este DNI",
+      );
+    }
+
+    if (data.commissionIds && data.commissionIds.length > 0) {
+      const foundCommissions = await this.commissionRepository.findByIds(
+        data.commissionIds,
+      );
+
+      if (foundCommissions.length !== data.commissionIds.length) {
+        const foundIds = new Set(foundCommissions.map((c) => c.id));
+        const missingIds = data.commissionIds.filter((id) => !foundIds.has(id));
+
+        throw new AppError(
+          404,
+          "COMMISSION_NOT_FOUND",
+          `Las siguientes comisiones no existen: ${missingIds.join(", ")}`,
+        );
+      }
+    }
+
+    return this.repository.create(data);
+  }
 
   async update(id: number, data: UpdateTeacherDto): Promise<Teacher> {
     const current = await this.findById(id);
@@ -106,5 +109,36 @@ export class TeacherService {
   async delete(id: number): Promise<void> {
     await this.findById(id);
     await this.repository.delete(id);
+  }
+
+  async addCommissions(id: number, commissionIds: number[]): Promise<Teacher> {
+    await this.findById(id);
+    await this.validateCommissions(commissionIds);
+
+    return this.repository.addCommissions(id, commissionIds);
+  }
+
+
+  async removeCommissions(id: number, commissionIds: number[]): Promise<Teacher> {
+    await this.findById(id);
+    await this.validateCommissions(commissionIds);
+
+    return this.repository.removeCommissions(id, commissionIds);
+  }
+
+  private async validateCommissions(commissionIds: number[]): Promise<void> {
+    const foundCommissions =
+      await this.commissionRepository.findByIds(commissionIds);
+
+    if (foundCommissions.length !== commissionIds.length) {
+      const foundIds = new Set(foundCommissions.map((c) => c.id));
+      const missingIds = commissionIds.filter((id) => !foundIds.has(id));
+
+      throw new AppError(
+        404,
+        "COMMISSION_NOT_FOUND",
+        `Las siguientes comisiones no existen: ${missingIds.join(", ")}`,
+      );
+    }
   }
 }

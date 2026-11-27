@@ -12,11 +12,19 @@ export const createTeacherSchema = z.object({
     .optional(),
 });
 
+//validacion para cuando se agreguen comissiones a un teacher creado
+export const teacherCommissionsSchema = z.object({
+  commissionIds: z
+    .array(z.number().int().positive("El ID de la comisión debe ser positivo"))
+    .min(1, "Debes enviar al menos una comisión")
+    .transform((ids) => [...new Set(ids)]),
+});
 
 export const teacherCommissionParamsSchema = z.object({
   id: z.coerce.number().int().positive(),
   commissionId: z.coerce.number().int().positive(),
 });
+
 
 export const updateTeacherSchema = createTeacherSchema
   .partial()
@@ -28,6 +36,7 @@ export const listTeachersQuerySchema = paginationQuerySchema.extend({
   search: z.string().trim().optional(),
 });
 
+export type TeacherCommissionsDto = z.infer<typeof teacherCommissionsSchema>;
 export type CreateTeacherDto = z.infer<typeof createTeacherSchema>;
 export type UpdateTeacherDto = z.infer<typeof updateTeacherSchema>;
 export type ListTeachersQuery = z.infer<typeof listTeachersQuerySchema>;

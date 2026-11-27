@@ -1,5 +1,6 @@
 import { Teacher } from "../models/teacher.model.js";
 import { teachers } from "../mocks/teacher.mock.js";
+import { commissions } from "../mocks/comission.mock.js";
 import { getPrismaClient } from "../lib/prisma.js";
 import {
   CreateTeacherDto,
@@ -117,10 +118,77 @@ export class TeacherRepository {
     return getPrismaClient().teacher.delete({ where: { id } });
   }
 
+  async addCommissions(id: number, commissionIds: number[]): Promise<Teacher> {
+    if (process.env.NODE_ENV === "test") {
+      const index = teachers.findIndex((teacher) => teacher.id === id);
+      if (index === -1) {
+        throw new Error("No se encontró el docente de prueba");
+      }
 
-  
+      const current = teachers[index]!;
+      const existingCommissions = current.commissions ?? [];
+      const existingIds = new Set(existingCommissions.map((c) => c.id));
+
+      const newCommissions = commissions
+        .filter((c) => commissionIds.includes(c.id) && !existingIds.has(c.id))
+        .map((c) => ({ ...c }));
+
+      const updatedCommissions = [...existingCommissions, ...newCommissions];
+      teachers[index] = {
+        ...current,
+        commissions: updatedCommissions,
+      };
+
+      return {
+        ...teachers[index]!,
+        commissions: [...updatedCommissions],
+      };
+    }
+
+    return getPrismaClient().teacher.update({
+      where: { id },
+      data: {
+        commissions: {
+          connect: commissionIds.map((commissionId) => ({ id: commissionId })),
+        },
+      },
+      include: { commissions: true },
+    });
+  }
+
+
+
+  async removeCommissions(id: number, commissionIds: number[]): Promise<Teacher> {
+    if (process.env.NODE_ENV === "test") {
+      const index = teachers.findIndex((teacher) => teacher.id === id);
+      if (index === -1) {
+        throw new Error("No se encontró el docente de prueba");
+      }
+
+      const current = teachers[index]!;
+      const updatedCommissions = (current.commissions ?? []).filter(
+        (c) => !commissionIds.includes(c.id),
+      );
+
+      teachers[index] = {
+        ...current,
+        commissions: updatedCommissions,
+      };
+
+      return {
+        ...teachers[index]!,
+        commissions: [...updatedCommissions],
+      };
+    }
+
+    return getPrismaClient().teacher.update({
+      where: { id },
+      data: {
+        commissions: {
+          disconnect: commissionIds.map((commissionId) => ({ id: commissionId })),
+        },
+      },
+      include: { commissions: true },
+    });
+  }
 }
-
-
-
-

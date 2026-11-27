@@ -8,6 +8,7 @@ import {
   listTeachersQuerySchema,
   type CreateTeacherDto,
   type UpdateTeacherDto,
+  type TeacherCommissionsDto
 } from "../schemas/teacher.schema.js";
 import { parseListQuery } from "../middlewares/validate.js";
 import type { PaginatedResponse } from "../utils/pagination.js";
@@ -15,10 +16,13 @@ import type { PaginatedResponse } from "../utils/pagination.js";
 export class TeacherController {
   constructor(private readonly service: TeacherService) {}
 
-  findAll = async (req: Request, res: Response<PaginatedResponse<TeacherResponseDto>>) => {
+  findAll = async (
+    req: Request,
+    res: Response<PaginatedResponse<TeacherResponseDto>>,
+  ) => {
     const query = parseListQuery(listTeachersQuerySchema, req.query);
     const result = await this.service.findAll(query);
-    
+
     res.status(200).json({
       data: result.data.map(toTeacherResponseDto),
       meta: result.meta,
@@ -49,5 +53,28 @@ export class TeacherController {
   delete = async (req: Request<{ id: string }>, res: Response) => {
     await this.service.delete(Number(req.params.id));
     res.status(204).end();
+  };
+
+  addCommissions = async (
+    req: Request<{ id: string }, TeacherResponseDto, TeacherCommissionsDto>,
+    res: Response,
+  ) => {
+    const updated = await this.service.addCommissions(
+      Number(req.params.id),
+      req.body.commissionIds,
+    );
+    res.status(200).json(toTeacherResponseDto(updated));
+  };
+
+
+  removeCommissions = async (
+    req: Request<{ id: string }, TeacherResponseDto, TeacherCommissionsDto>,
+    res: Response,
+  ) => {
+    const updated = await this.service.removeCommissions(
+      Number(req.params.id),
+      req.body.commissionIds,
+    );
+    res.status(200).json(toTeacherResponseDto(updated));
   };
 }
