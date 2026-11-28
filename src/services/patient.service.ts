@@ -1,4 +1,5 @@
 import { PatientRepository } from "../repository/patients.repository.js";
+import { StudentRepository } from "../repository/stuents.repository.js";
 import { Patient } from "../models/patient.model.js";
 import {
   CreatePatientDto,
@@ -9,17 +10,24 @@ import { AppError } from "../utils/AppError.js";
 import { paginate, type PaginatedResponse } from "../utils/pagination.js";
 
 export class PatientService {
-  constructor(private readonly repository: PatientRepository) {}
+  constructor(
+    private readonly repository: PatientRepository,
+    private readonly studentRepository?: StudentRepository,
+  ) {}
 
-  async findAll(query: ListPatientsQuery = { page: 1, limit: 10 }): Promise<PaginatedResponse<Patient>> {
+  async findAll(
+    query: ListPatientsQuery = { page: 1, limit: 10 },
+  ): Promise<PaginatedResponse<Patient>> {
     const search = query.search?.toLowerCase();
-    
+
     const patients = await this.repository.findAll();
 
     const matchesSearch = search
       ? patients.filter((patient) =>
-          [patient.name, patient.last_name, patient.email, patient.dni]
-            .some((value) => value.toLowerCase().includes(search)))
+          [patient.name, patient.last_name, patient.email, patient.dni].some(
+            (value) => value.toLowerCase().includes(search),
+          ),
+        )
       : patients;
 
     return paginate(matchesSearch, query);
@@ -56,6 +64,10 @@ export class PatientService {
       );
     }
 
+    if (data.studentIds?.length) {
+      await this.validateStudentsExist(data.studentIds);
+    }
+
     return this.repository.create(data);
   }
 
@@ -84,11 +96,45 @@ export class PatientService {
       }
     }
 
+    if (data.studentIds?.length) {
+      await this.validateStudentsExist(data.studentIds);
+    }
+
     return this.repository.update(id, data);
   }
 
   async delete(id: number): Promise<void> {
     await this.findById(id);
     await this.repository.delete(id);
+  }
+
+  async addStudents(patientId: number, studentIds: number[]): Promise<Patient> {
+    await this.findById(patientId);
+    await this.validateStudentsExist(studentIds);
+    return this.repository.addStudents(patientId, studentIds);
+  }
+
+  async removeStudents(
+    patientId: number,
+    studentIds: number[],
+  ): Promise<Patient> {
+    await this.findById(patientId);
+    await this.validateStudentsExist(studentIds);
+    return this.repository.removeStudents(patientId, studentIds);
+  }
+
+  private async validateStudentsExist(studentIds: number[]): Promise<void> {
+    if (!this.studentRepository) return;
+
+    for (const studentId of studentIds) {
+      const student = await this.studentRepository.findById(studentId);
+      if (!student) {
+        throw new AppError(
+          404,
+          "STUDENT_NOT_FOUND",
+          `No se encontró el estudiante con id ${studentId}`,
+        );
+      }
+    }
   }
 }

@@ -1,8 +1,12 @@
 import type { Request, Response } from "express";
 
-import { toPatientResponseDto, type PatientResponseDto } from "../dtos/patient-response.dto.js";
+import {
+  toPatientResponseDto,
+  type PatientResponseDto,
+} from "../dtos/patient-response.dto.js";
 import { parseListQuery } from "../middlewares/validate.js";
 import type {
+  AssignStudentsToPatientDto,
   CreatePatientDto,
   ListPatientsQuery,
   UpdatePatientDto,
@@ -18,10 +22,13 @@ export class PatientController {
     req: Request,
     res: Response<PaginatedResponse<PatientResponseDto>>,
   ): Promise<void> => {
-    const query: ListPatientsQuery = parseListQuery(listPatientsQuerySchema, req.query);
+    const query: ListPatientsQuery = parseListQuery(
+      listPatientsQuerySchema,
+      req.query,
+    );
     const result = await this.service.findAll(query);
     res.status(200).json({
-      data: result.data.map(toPatientResponseDto),
+      data: result.data.map((patient) => toPatientResponseDto(patient)),
       meta: result.meta,
     });
   };
@@ -31,7 +38,9 @@ export class PatientController {
     res: Response<PatientResponseDto>,
   ): Promise<void> => {
     const patient = await this.service.findById(Number(req.params.id));
-    res.status(200).json(toPatientResponseDto(patient));
+    res
+      .status(200)
+      .json(toPatientResponseDto(patient, { includeStudents: true }));
   };
 
   create = async (
@@ -56,5 +65,33 @@ export class PatientController {
   ): Promise<void> => {
     await this.service.delete(Number(req.params.id));
     res.status(204).end();
+  };
+
+  addStudents = async (
+    req: Request<{ id: string }, PatientResponseDto, AssignStudentsToPatientDto>,
+    res: Response<PatientResponseDto>,
+  ): Promise<void> => {
+    const patientId = Number(req.params.id);
+    const updated = await this.service.addStudents(
+      patientId,
+      req.body.studentIds,
+    );
+    res
+      .status(200)
+      .json(toPatientResponseDto(updated, { includeStudents: true }));
+  };
+
+  removeStudents = async (
+    req: Request<{ id: string }, PatientResponseDto, AssignStudentsToPatientDto>,
+    res: Response<PatientResponseDto>,
+  ): Promise<void> => {
+    const patientId = Number(req.params.id);
+    const updated = await this.service.removeStudents(
+      patientId,
+      req.body.studentIds,
+    );
+    res
+      .status(200)
+      .json(toPatientResponseDto(updated, { includeStudents: true }));
   };
 }

@@ -12,31 +12,6 @@ datasource db {
   provider = "postgresql"
 }
 
-
-model Teacher {
-  id         Int    @id @default(autoincrement())
-  name       String
-  last_name  String
-  email      String @unique
-  dni        String @unique
-  commissions Commission[]
-
-  @@map("teachers")
-}
-
-
-model Patient {
-  id         Int    @id @default(autoincrement())
-  name       String
-  last_name  String
-  email      String @unique
-  dni        String @unique
-  commission Int
-
-  @@map("patients")
-}
-
-
 enum Role {
   admin
   docente
@@ -57,6 +32,61 @@ model Person {
 }
 
 
+model Commission {
+  id           Int      @id @default(autoincrement())
+  name         String   @unique 
+  year         Int
+  turno        String   // "Mañana", "Tarde", "Noche"
+  cuatrimestre Int      // 1 o 2
+  createdAt    DateTime @default(now())
+
+  teachers  Teacher[]
+  students Student[]
+
+  @@map("commissions")
+}
+
+
+model Teacher {
+  id         Int    @id @default(autoincrement())
+  name       String
+  last_name  String
+  email      String @unique
+  dni        String @unique
+  commissions Commission[]
+
+  @@map("teachers")
+}
+
+
+model Patient {
+  id        Int       @id @default(autoincrement())
+  name      String
+  last_name String
+  email     String    @unique
+  dni       String    @unique
+  students  Student[]
+
+  @@map("patients")
+}
+
+model Student {
+  id           Int         @id @default(autoincrement())
+  name         String
+  last_name    String
+  email        String      @unique
+  dni          String      @unique
+  commissionId Int?
+  commission   Commission? @relation(fields: [commissionId], references: [id])
+  patients     Patient[]
+
+  @@map("students")
+}
+
+
+
+
+
 model Exercise {
   id           Int    @id @default(autoincrement())
   name         String
@@ -72,15 +102,3 @@ model Exercise {
 }
 
 
-model Commission {
-  id           Int      @id @default(autoincrement())
-  name         String   @unique 
-  year         Int
-  turno        String   // "Mañana", "Tarde", "Noche"
-  cuatrimestre Int      // 1 o 2
-  createdAt    DateTime @default(now())
-
-  teachers  Teacher[]
-
-  @@map("commissions")
-}

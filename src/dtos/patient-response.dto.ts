@@ -1,4 +1,5 @@
 import type { Patient } from "../models/patient.model.js";
+import type { Student } from "../models/student.model.js";
 
 export interface PatientResponseDto {
   id: number;
@@ -6,16 +7,24 @@ export interface PatientResponseDto {
   last_name: string;
   email: string;
   dni: string;
-  commission: number;
+  students?: Student[];
 }
 
-export function toPatientResponseDto(patient: Patient): PatientResponseDto {
-  return {
+export function toPatientResponseDto(
+  patient: Patient,
+  options?: { includeStudents?: boolean },
+): PatientResponseDto {
+  const dto: PatientResponseDto = {
     id: patient.id,
     name: patient.name,
     last_name: patient.last_name,
     email: patient.email,
     dni: patient.dni,
-    commission: patient.commission,
   };
+
+  if (options?.includeStudents && patient.students !== undefined) {
+    dto.students = patient.students;
+  }
+
+  return dto;
 }

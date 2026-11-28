@@ -8,6 +8,7 @@ import {
   optionRoutes,
   patientRoutes,
   personRoutes,
+  studentRoutes,
   teacherRoutes,
   userRoutes,
   comissionRoutes,
@@ -46,6 +47,7 @@ app.get("/health", healthCheck);
 
 app.use("/api/v1/teachers", teacherRoutes);
 app.use("/api/v1/patients", patientRoutes);
+app.use("/api/v1/students", studentRoutes);
 app.use("/api/v1/persons", personRoutes);
 app.use("/api/v1/exercises", exercisesRoutes);
 app.use("/api/v1/options", optionRoutes);
