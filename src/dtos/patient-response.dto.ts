@@ -20,6 +20,7 @@ export function toPatientResponseDto(
     last_name: patient.last_name,
     email: patient.email,
     dni: patient.dni,
+    students: patient.students
   };
 
   if (options?.includeStudents && patient.students !== undefined) {

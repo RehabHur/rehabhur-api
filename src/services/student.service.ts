@@ -15,7 +15,7 @@ export class StudentService {
     private readonly repository: StudentRepository,
     private readonly commissionRepository: CommissionRepository,
     private readonly patientRepository?: PatientRepository,
-  ) {}
+  ) { }
 
   async findAll(
     query: ListStudentsQuery = { page: 1, limit: 10 },
@@ -26,10 +26,10 @@ export class StudentService {
 
     const matchesSearch = search
       ? students.filter((student) =>
-          [student.name, student.last_name, student.email, student.dni].some(
-            (value) => value.toLowerCase().includes(search),
-          ),
-        )
+        [student.name, student.last_name, student.email, student.dni].some(
+          (value) => value.toLowerCase().includes(search),
+        ),
+      )
       : students;
 
     return paginate(matchesSearch, query);
@@ -63,7 +63,7 @@ export class StudentService {
     }
 
     if (data.commissionId !== undefined && data.commissionId !== null) {
-      await this.validateCommissionExists(data.commissionId);
+      await this.commissionRepository.findById(data.commissionId);
     }
 
     return this.repository.create(data);
@@ -95,7 +95,7 @@ export class StudentService {
     }
 
     if (data.commissionId !== undefined && data.commissionId !== null) {
-      await this.validateCommissionExists(data.commissionId);
+      await this.commissionRepository.findById(data.commissionId);
     }
 
     return this.repository.update(id, data);
@@ -125,10 +125,19 @@ export class StudentService {
     return this.repository.addPatients(studentId, patientIds);
   }
 
-  async removePatient(studentId: number, patientId: number): Promise<Student> {
+  async removePatients(
+    studentId: number,
+    patientIds: number[],
+  ): Promise<Student> {
     await this.findById(studentId);
+    await this.validatePatientsExist(patientIds);
+    return this.repository.removePatients(studentId, patientIds);
+  }
 
-    if (this.patientRepository) {
+  private async validatePatientsExist(patientIds: number[]): Promise<void> {
+    if (!this.patientRepository) return;
+
+    for (const patientId of patientIds) {
       const patient = await this.patientRepository.findById(patientId);
       if (!patient) {
         throw new AppError(
@@ -137,19 +146,6 @@ export class StudentService {
           `No se encontró el paciente con id ${patientId}`,
         );
       }
-    }
-
-    return this.repository.removePatient(studentId, patientId);
-  }
-
-  private async validateCommissionExists(commissionId: number): Promise<void> {
-    const commission = await this.commissionRepository.findById(commissionId);
-    if (!commission) {
-      throw new AppError(
-        404,
-        "COMMISSION_NOT_FOUND",
-        `No se encontró la comisión con id ${commissionId}`,
-      );
     }
   }
 }

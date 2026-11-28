@@ -29,6 +29,7 @@ export const toStudentResponseDto = (
     email: student.email,
     dni: student.dni,
     commissionId: student.commissionId ?? null,
+    patients : student.patients
   };
 
   if (options?.includeCommission && student.commission !== undefined) {

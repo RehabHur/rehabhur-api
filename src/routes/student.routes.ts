@@ -35,7 +35,7 @@ router
   .delete(
   "/:id/patients",
   schemaValidator(assignPatientsToStudentSchema),
-  controller.removePatient,
+  controller.removePatients,
 );
 
 export default router;

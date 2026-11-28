@@ -7,7 +7,7 @@ export interface TeacherResponseDto {
   last_name: string;
   email: string;
   dni: string;
-  commissions: CommissionResponseDto[];//Siempre presente, aunque sea []
+  commissions: CommissionResponseDto[];
 }
 
 export function toTeacherResponseDto(teacher: Teacher): TeacherResponseDto {

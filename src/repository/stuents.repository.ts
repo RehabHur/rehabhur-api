@@ -175,6 +175,21 @@ export class StudentRepository {
     });
   }
 
+
+  async delete(id: number): Promise<Student> {
+    if (process.env.NODE_ENV === "test") {
+      const index = students.findIndex((student) => student.id === id);
+      if (index === -1) {
+        throw new Error("No se encontró el estudiante de prueba");
+      }
+
+      const [deleted] = students.splice(index, 1);
+      return { ...deleted! };
+    }
+
+    return getPrismaClient().student.delete({ where: { id } });
+  }
+
   async addPatients(studentId: number, patientIds: number[]): Promise<Student> {
     if (process.env.NODE_ENV === "test") {
       const index = students.findIndex((student) => student.id === studentId);
@@ -221,7 +236,7 @@ export class StudentRepository {
     });
   }
 
-  async removePatient(studentId: number, patientId: number): Promise<Student> {
+  async removePatients(studentId: number, patientIds: number[]): Promise<Student> {
     if (process.env.NODE_ENV === "test") {
       const index = students.findIndex((student) => student.id === studentId);
       if (index === -1) {
@@ -229,8 +244,9 @@ export class StudentRepository {
       }
 
       const current = students[index]!;
+      const idsToRemove = new Set(patientIds);
       const nextPatients = (current.patients ?? []).filter(
-        (p) => p.id !== patientId,
+        (p) => !idsToRemove.has(p.id),
       );
 
       students[index] = {
@@ -240,7 +256,7 @@ export class StudentRepository {
 
       return {
         ...students[index]!,
-        patients: students[index]!.patients!.map((p) => ({ ...p })),
+        patients: (students[index]!.patients ?? []).map((p) => ({ ...p })),
       };
     }
 
@@ -248,7 +264,7 @@ export class StudentRepository {
       where: { id: studentId },
       data: {
         patients: {
-          disconnect: { id: patientId },
+          disconnect: patientIds.map((id) => ({ id })),
         },
       },
       include: {
@@ -256,19 +272,5 @@ export class StudentRepository {
         patients: true,
       },
     });
-  }
-
-  async delete(id: number): Promise<Student> {
-    if (process.env.NODE_ENV === "test") {
-      const index = students.findIndex((student) => student.id === id);
-      if (index === -1) {
-        throw new Error("No se encontró el estudiante de prueba");
-      }
-
-      const [deleted] = students.splice(index, 1);
-      return { ...deleted! };
-    }
-
-    return getPrismaClient().student.delete({ where: { id } });
   }
 }

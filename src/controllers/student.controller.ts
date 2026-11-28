@@ -14,7 +14,7 @@ import { parseListQuery } from "../middlewares/validate.js";
 import type { PaginatedResponse } from "../utils/pagination.js";
 
 export class StudentController {
-  constructor(private readonly service: StudentService) {}
+  constructor(private readonly service: StudentService) { }
 
   findAll = async (
     req: Request,
@@ -67,15 +67,22 @@ export class StudentController {
       .json(toStudentResponseDto(updated, { includeCommission: true, includePatients: true }));
   };
 
-  removePatient = async (
-    req: Request<{ id: string; patientId: string }>,
-    res: Response,
-  ) => {
+  removePatients = async (
+    req: Request<{ id: string }, StudentResponseDto, AssignPatientsToStudentDto>,
+    res: Response<StudentResponseDto>,
+  ): Promise<void> => {
     const studentId = Number(req.params.id);
-    const patientId = Number(req.params.patientId);
-    const updated = await this.service.removePatient(studentId, patientId);
+    const updated = await this.service.removePatients(
+      studentId,
+      req.body.patientIds,
+    );
     res
       .status(200)
-      .json(toStudentResponseDto(updated, { includeCommission: true, includePatients: true }));
+      .json(
+        toStudentResponseDto(updated, {
+          includeCommission: true,
+          includePatients: true,
+        }),
+      );
   };
 }

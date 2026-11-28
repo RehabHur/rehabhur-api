@@ -22,7 +22,9 @@ export class PatientRepository {
       return patient ? { ...patient } : null;
     }
 
-    return getPrismaClient().patient.findUnique({ where: { id } });
+    return getPrismaClient().patient.findUnique({ where: { id } , include: {
+      students:true
+    } });
   }
 
   async findByEmail(email: string): Promise<Patient | null> {
